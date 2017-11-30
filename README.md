@@ -8,8 +8,11 @@ Only forward propagation is implemented for now.
 
 ## Expectations
 Hypothesis 1: MLP on CPU programmed with OpenCL will run faster than MLP programmed in bare C++
+
 Hypothesis 2: Every implementation on GPU will run faster than any implementation on CPU
+
 Hypothesis 3: Size of a network (ie. number of layers and operations that are needed to be calculated) greatly impacts the speedup of GPU implementation. Larger networks should get more speedup than smaller when network is beeing run on GPU.
+
 Hypothesis 4: Implementations in OpenCL and Tensorflow should be comparable. Tensorflow will be probably a little bit faster, since this project is not about trying to optimize as much as possible.
 
 ## Methodology
