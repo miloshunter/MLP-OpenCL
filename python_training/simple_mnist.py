@@ -9,14 +9,14 @@ def save_2d_array_c(array, name):
     file = open(name+".h", "w")
     file.writelines("//Testiranje ispisa\n")
     file.writelines("//Niz je: " + str(array.shape) + "\n")
-    file.writelines("extern const double* "+name+"["+
-                    str(array.shape[1])+","+str(array.shape[0])+
+    file.writelines("double "+name+"["+
+                    str(array.shape[1])+"]["+str(array.shape[0])+
                     "];\n")
     file.close()
 
     file = open(name+".c", "w")
-    file.writelines("const double* "+name+"[" +
-                    str(array.shape[1]) + "," + str(array.shape[0]) +
+    file.writelines("double "+name+"[" +
+                    str(array.shape[1]) + "][" + str(array.shape[0]) +
                     "] = {\n")
 
     for i in range(array.shape[1]):
@@ -38,7 +38,7 @@ def save_1d_array_c(array, name):
     file = open(name+".h", "w")
     file.writelines("//Testiranje ispisa\n")
     file.writelines("//Niz je: " + str(array.shape) + "\n")
-    file.writelines("extern const double* "+name+"["+
+    file.writelines("extern double* "+name+"["+
                     str(array.shape[0])+
                     "];\n")
     file.close()
@@ -52,6 +52,10 @@ def save_1d_array_c(array, name):
             file.writelines(",")
     file.writelines("};\n")
     file.close()
+
+
+im = io.imread('../test_pics/dvojka.png', as_gray=True)
+save_2d_array_c(im, "dvojka")
 
 
 mnist = tf.keras.datasets.mnist
@@ -73,13 +77,14 @@ model.evaluate(x_test, y_test)
 
 weights = model.get_weights()
 
+
 save_2d_array_c(weights[0], "L1_w")
 save_2d_array_c(weights[2], "L2_w")
 save_1d_array_c(weights[1], "L1_b")
 save_1d_array_c(weights[3], "L2_b")
 
 
-im = io.imread('test_pics/osmica.png', as_gray=True)
+
 
 slika = 255 - (im * 255)
 
@@ -95,3 +100,4 @@ print(predikcija)
 #print(model.get_weights())
 
 pass
+
