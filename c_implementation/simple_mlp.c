@@ -1,22 +1,29 @@
 #include <stdio.h>
-#include "weights/L1_b.c"
-#include "weights/L1_w.c"
-#include "weights/L2_b.c"
-#include "weights/L2_w.c"
-#include "weights/dvojka.c"
-#include "weights/image.c"
-#include <libpng12/png.h>
-#include "utils.h"
+#include <stdlib.h>
+#include "weights/w1.h"
+#include "weights/w2.h"
+#include "weights/w3.h"
+#include "weights/wout.h"
+#include "weights/b1.h"
+#include "weights/b2.h"
+#include "weights/b3.h"
+#include "weights/bout.h"
+#include "weights/sedmica.h"
+#include "weights/layer1.h"
 #include <math.h>
 #include <assert.h>
 
 #define PIC_SIZE 28
 #define INPUT_SIZE 28*28
-#define L1_NUM 512
-#define L2_NUM 10
 #define CLASS_NUM 10
 
-int LAYER_SIZE[3] = {784, 512, 10};
+const int LAYER_SIZE[5] = {784, 512, 256, 128, 10};
+#define n_input  784
+#define n_layer1  512
+#define n_layer2  256
+#define n_layer3  128
+#define n_output  10
+//#define LAYER_SIZE(index) {784, 512, 256, 128, 10}
 
 static void softmax(double *input, size_t input_len) {
     double * Z = input;
@@ -35,7 +42,7 @@ static void softmax(double *input, size_t input_len) {
 
 }
 
-static void relu(double *input, size_t input_len){
+static void relu(double *input, int input_len){
     for(int i = 0; i < input_len; i++)
     {
         input[i] = max(0, input[i]);
@@ -45,10 +52,12 @@ static void relu(double *input, size_t input_len){
 
 //  Placeholders for calculations
 double input[INPUT_SIZE];
-double L1[L1_NUM];
-double L2[L2_NUM];
+double L1[n_layer1];
+double L2[n_layer2];
+double L3[n_layer3];
+double output[n_output];
 
-void flatten_image()
+void flatten_image(double ** image)
 {
     for(size_t i = 0; i < PIC_SIZE; i++)
     {
@@ -69,7 +78,7 @@ void calculate_layer(int layer_num, double* input, double (*weights)[],
 
     for(int i = 0; i < Y; i++)
     {
-        for(size_t j = 0; j < X; j++)
+        for(int j = 0; j < X; j++)
         {
             output[i] += input[j]*(*weights)[i,j];
         }
@@ -88,20 +97,41 @@ void calculate_layer(int layer_num, double* input, double (*weights)[],
     
 }
 
-
-int main()
+void load_input(double* image)
 {
-    flatten_image();
+	for (int i = 0; i < n_input; i++)
+	{
+		input[i] = image[i];
+	}
+}
 
+void compare_1d_array(double *x, double *y, int length)
+{
+	double max_error = 0;
+	for (int i = 0; i < length; i++){
+		if (fabs((x[i]-y[i]) > max_error))
+		{
+			max_error = fabs((x[i] - y[i]));
+		}
+	}
+	printf("Max error = %f\n", max_error);
+}
 
-    calculate_layer(1, input, L1_w, L1_b, L1, 1);
-    calculate_layer(2, L1, L2_w, L2_b, L2, 2);
+void main()
+{
+	load_input(sedmica);
 
-    printf("Izracunat izlaz: ");
+    calculate_layer(1, input, w1, b1, L1, 1);
+
+	compare_1d_array(L1, layer1, LAYER_SIZE[0]);
+    //calculate_layer(2, L1, w2, b2, L2, 2);
+
+    /*printf("Izracunat izlaz: ");
     for(size_t i = 0; i < CLASS_NUM; i++)
     {
         printf("\t%.2f", L2[i]);
     }
-    printf("\n");    
+    printf("\n"); */   
     
+	
 }
