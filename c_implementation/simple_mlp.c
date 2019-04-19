@@ -1,18 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "weights/w1.h"
-#include "weights/w2.h"
-#include "weights/w3.h"
-#include "weights/wout.h"
-#include "weights/b1.h"
-#include "weights/b2.h"
-#include "weights/b3.h"
-#include "weights/bout.h"
+#include "weights/network2/w1.h"
+#include "weights/network2/w2.h"
+#include "weights/network2/w3.h"
+#include "weights/network2/wout.h"
+#include "weights/network2/b1.h"
+#include "weights/network2/b2.h"
+#include "weights/network2/b3.h"
+#include "weights/network2/bout.h"
 #include "weights/slike.h"
-#include "weights/layer1.h"
-#include "weights/layer2.h"
-#include "weights/layer3.h"
-#include "weights/output.h"
+#include "weights/network2/layer1.h"
+#include "weights/network2/layer2.h"
+#include "weights/network2/layer3.h"
+#include "weights/network2/output.h"
 #include <math.h>
 #include <assert.h>
 #include <sys/time.h>
@@ -22,13 +22,12 @@
 #define INPUT_SIZE 28*28
 #define CLASS_NUM 10
 
-const int LAYER_SIZE[5] = {784, 512, 256, 128, 10};
+const int LAYER_SIZE[5] = {784, 2048, 1024, 512, 10};
 #define n_input  784
-#define n_layer1  512
-#define n_layer2  256
-#define n_layer3  128
+#define n_layer1  2048
+#define n_layer2  1024
+#define n_layer3  512
 #define n_output  10
-//#define LAYER_SIZE(index) {784, 512, 256, 128, 10}
 
 static void softmax(double *input, size_t input_len) {
     double * Z = input;
