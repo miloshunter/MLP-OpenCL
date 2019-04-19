@@ -74,7 +74,7 @@ def save_1d_array_c(array, name):
     file.close()
 
 
-image_name = 'sedmica'
+image_name = 'osmica'
 im = io.imread('test_pics/'+image_name+'.png', as_gray=True)
 im = 1 - im
 
@@ -90,9 +90,9 @@ with tf.Session() as sess:
     layer_num = 4
 
     n_input = 784
-    n_hidden1 = 4096
-    n_hidden2 = 2048
-    n_hidden3 = 2048
+    n_hidden1 = 2048
+    n_hidden2 = 1024
+    n_hidden3 = 512
     n_output = 10
 
     learning_rate = 1e-4
@@ -139,7 +139,7 @@ with tf.Session() as sess:
 
     # Training
     # train on mini batches
-    for epoch in range(1):
+    for epoch in range(20):
         for i in range(n_iterations):
             batch_x, batch_y = mnist.train.next_batch(batch_size)
             sess.run(train_step, feed_dict={
