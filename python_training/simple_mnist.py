@@ -90,9 +90,9 @@ with tf.Session() as sess:
     layer_num = 4
 
     n_input = 784
-    n_hidden1 = 512
-    n_hidden2 = 256
-    n_hidden3 = 128
+    n_hidden1 = 4096
+    n_hidden2 = 2048
+    n_hidden3 = 2048
     n_output = 10
 
     learning_rate = 1e-4
@@ -152,37 +152,16 @@ with tf.Session() as sess:
                     [cross_entropy, accuracy],
                     feed_dict={X: batch_x, Y: batch_y, keep_prob: 1.0}
                 )
-                # print(
-                #     "Iteration",
-                #     str(i),
-                #     "\t| Loss =",
-                #     str(minibatch_loss),
-                #     "\t| Accuracy =",
-                #     str(minibatch_accuracy)
-                # )
 
         test_accuracy = sess.run(accuracy, feed_dict={X: mnist.test.images, Y: mnist.test.labels, keep_prob: 1.0})
         print("Accuracy on test set:", test_accuracy)
 
-    #########################################################
-    # Getting weights and hidden layer numbers
-    # save_2d_array_c(weights[0], "L1_w")
-    # numpy.save('exported_numpy_files/L1_w', weights[0])
-    # save_2d_array_c(weights[2], "L2_w")
-    # numpy.save('exported_numpy_files/L2_w',  weights[2])
-    # save_1d_array_c(weights[1], "L1_b")
-    # numpy.save('exported_numpy_files/L1_b',  weights[1])
-    # save_1d_array_c(weights[3], "L2_b")
-    # numpy.save('exported_numpy_files/L2_b',  weights[3])
-    #
     ulaz = np.array(im)
     y = ulaz.reshape(784)
-    #save_1d_array_c(y, image_name)
+    save_1d_array_c(y, image_name)
 
-    # np.save('exported_numpy_files/slika', y)
-
-    #save_c_weights()
-    #save_c_layers()
+    save_c_weights()
+    save_c_layers()
     t0 = time.time()
     # Create the Timeline object, and write it to a json
     prediction = sess.run(output_layer, feed_dict={X: [y]}, options=run_options, run_metadata=run_metadata)
