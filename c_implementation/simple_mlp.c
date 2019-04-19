@@ -8,8 +8,11 @@
 #include "weights/b2.h"
 #include "weights/b3.h"
 #include "weights/bout.h"
-#include "weights/sedmica.h"
+#include "weights/slike.h"
 #include "weights/layer1.h"
+#include "weights/layer2.h"
+#include "weights/layer3.h"
+#include "weights/output.h"
 #include <math.h>
 #include <assert.h>
 
@@ -45,7 +48,7 @@ static void softmax(double *input, size_t input_len) {
 static void relu(double *input, int input_len){
     for(int i = 0; i < input_len; i++)
     {
-        input[i] = max(0, input[i]);
+        input[i] = fmax((double)0, input[i]);
     }
 }
 
@@ -55,7 +58,7 @@ double input[INPUT_SIZE];
 double L1[n_layer1];
 double L2[n_layer2];
 double L3[n_layer3];
-double output[n_output];
+double Loutput[n_output];
 
 void flatten_image(double ** image)
 {
@@ -69,30 +72,27 @@ void flatten_image(double ** image)
 }
 
 //  Activation function: 1 - Relu; 2 - softmax
-void calculate_layer(int layer_num, double* input, double (*weights)[],
-                        double* biases, double* output, int activation_function)
+void calculate_layer(int layer_num, double* input_matrix, double *weights,
+                        double* biases, double* out_matrix, int activation_function)
 {
     printf("Racunanje sloja: %d\n", layer_num);
     int X = LAYER_SIZE[layer_num-1];
     int Y = LAYER_SIZE[layer_num];
+    int x = 20, y=10;
 
     for(int i = 0; i < Y; i++)
     {
         for(int j = 0; j < X; j++)
         {
-            output[i] += input[j]*(*weights)[i,j];
+            out_matrix[i] += input_matrix[j]* (*((weights+i*X) + j));
         }
-    }
-
-    for(int i = 0; i < Y; i++)
-    {
-        output[i] += biases[i];
+        out_matrix[i] += biases[i];
     }
 
     if (activation_function == 1) {
-        relu(output, Y);
+        relu(out_matrix, Y);
     } else {
-        //softmax(output, Y);
+        softmax(out_matrix, Y);
     }   
     
 }
@@ -108,30 +108,33 @@ void load_input(double* image)
 void compare_1d_array(double *x, double *y, int length)
 {
 	double max_error = 0;
+    int max_index = -1;
 	for (int i = 0; i < length; i++){
-		if (fabs((x[i]-y[i]) > max_error))
+		if (fabs((x[i]-y[i])) > max_error)
 		{
 			max_error = fabs((x[i] - y[i]));
+            max_index = i;
 		}
 	}
-	printf("Max error = %f\n", max_error);
+	printf("Max error = %f on index %d\n", max_error, max_index);
 }
 
 void main()
 {
-	load_input(sedmica);
+    
+	load_input(trojka);
 
-    calculate_layer(1, input, w1, b1, L1, 1);
+    calculate_layer(1, input, (double *)w1, b1, L1, 1);
+    calculate_layer(2, L1, (double *)w2, b2, L2, 1);
+    calculate_layer(3, L2, (double *)w3, b3, L3, 1);
+    calculate_layer(4, L3, (double *)wout, bout, Loutput, 0);
 
-	compare_1d_array(L1, layer1, LAYER_SIZE[0]);
-    //calculate_layer(2, L1, w2, b2, L2, 2);
-
-    /*printf("Izracunat izlaz: ");
+    printf("Izracunat izlaz: ");
     for(size_t i = 0; i < CLASS_NUM; i++)
     {
-        printf("\t%.2f", L2[i]);
+        printf("\t%.2f", Loutput[i]);
     }
-    printf("\n"); */   
+    printf("\n");
     
 	
 }
