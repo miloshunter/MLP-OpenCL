@@ -1,9 +1,9 @@
 import tensorflow as tf
-from PIL import Image
 import numpy as np
-from skimage import color
 from skimage import io
 from tensorflow.examples.tutorials.mnist import input_data
+from tensorflow.python.client import timeline
+import time
 
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
@@ -80,6 +80,8 @@ im = 1 - im
 
 
 with tf.Session() as sess:
+    run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
+    run_metadata = tf.RunMetadata()
     n_train = mnist.train.num_examples
     n_validation = mnist.validation.num_examples
     n_test = mnist.test.num_examples
@@ -137,7 +139,7 @@ with tf.Session() as sess:
 
     # Training
     # train on mini batches
-    for epoch in range(5):
+    for epoch in range(1):
         for i in range(n_iterations):
             batch_x, batch_y = mnist.train.next_batch(batch_size)
             sess.run(train_step, feed_dict={
@@ -175,16 +177,25 @@ with tf.Session() as sess:
     #
     ulaz = np.array(im)
     y = ulaz.reshape(784)
-    save_1d_array_c(y, image_name)
+    #save_1d_array_c(y, image_name)
 
     # np.save('exported_numpy_files/slika', y)
 
-    save_c_weights()
-    save_c_layers()
+    #save_c_weights()
+    #save_c_layers()
+    t0 = time.time()
+    # Create the Timeline object, and write it to a json
+    prediction = sess.run(output_layer, feed_dict={X: [y]}, options=run_options, run_metadata=run_metadata)
 
-    prediction = sess.run(output_layer, feed_dict={X: [y]})
+    tl = timeline.Timeline(run_metadata.step_stats)
+    ctf = tl.generate_chrome_trace_format()
+    with open('timeline.json', 'w') as f:
+        f.write(ctf)
+    t1 = time.time()
+
     np.set_printoptions(precision=2)
     np.set_printoptions(suppress=True)
+    print("Time elapsed: ", (t1 - t0))
     print("Prediction for test image:", prediction)
 
 

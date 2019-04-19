@@ -15,6 +15,8 @@
 #include "weights/output.h"
 #include <math.h>
 #include <assert.h>
+#include <sys/time.h>
+#include <gperftools/profiler.h>
 
 #define PIC_SIZE 28
 #define INPUT_SIZE 28*28
@@ -75,18 +77,22 @@ void flatten_image(double ** image)
 void calculate_layer(int layer_num, double* input_matrix, double *weights,
                         double* biases, double* out_matrix, int activation_function)
 {
-    printf("Racunanje sloja: %d\n", layer_num);
+    int i, j;
+    //printf("Racunanje sloja: %d\n", layer_num);
     int X = LAYER_SIZE[layer_num-1];
     int Y = LAYER_SIZE[layer_num];
     int x = 20, y=10;
-
-    for(int i = 0; i < Y; i++)
+    #pragma omp parallel private(i,j) shared(Y, X, out_matrix, input_matrix, weights, biases)
     {
-        for(int j = 0; j < X; j++)
+        #pragma omp for schedule(static)
+        for(i = 0; i < Y; i++)
         {
-            out_matrix[i] += input_matrix[j]* (*((weights+i*X) + j));
+            for(j = 0; j < X; j++)
+            {
+                out_matrix[i] += input_matrix[j]* (*((weights+i*X) + j));
+            }
+            out_matrix[i] += biases[i];
         }
-        out_matrix[i] += biases[i];
     }
 
     if (activation_function == 1) {
@@ -119,22 +125,39 @@ void compare_1d_array(double *x, double *y, int length)
 	printf("Max error = %f on index %d\n", max_error, max_index);
 }
 
+void forward_propagation(){
+    calculate_layer(1, input, (double *)w1, b1, L1, 1);
+    calculate_layer(2, L1, (double *)w2, b2, L2, 1);
+    calculate_layer(3, L2, (double *)w3, b3, L3, 1);
+    calculate_layer(4, L3, (double *)wout, bout, Loutput, 0);
+}
+
 void main()
 {
     
 	load_input(trojka);
 
-    calculate_layer(1, input, (double *)w1, b1, L1, 1);
-    calculate_layer(2, L1, (double *)w2, b2, L2, 1);
-    calculate_layer(3, L2, (double *)w3, b3, L3, 1);
-    calculate_layer(4, L3, (double *)wout, bout, Loutput, 0);
+    struct timeval  tv1, tv2;
+    gettimeofday(&tv1, NULL);
+    // for(int i = 0; i < 1000; i++)
+    // {
+        
+    forward_propagation();
+        
 
-    printf("Izracunat izlaz: ");
-    for(size_t i = 0; i < CLASS_NUM; i++)
-    {
-        printf("\t%.2f", Loutput[i]);
-    }
-    printf("\n");
+    // }
+    gettimeofday(&tv2, NULL);
+
+    printf ("Total time = %f microseconds\n",
+         (double) (tv2.tv_usec - tv1.tv_usec) +
+         (double) 1000000*(tv2.tv_sec - tv1.tv_sec));
+
+    // printf("Izracunat izlaz: ");
+    // for(size_t i = 0; i < CLASS_NUM; i++)
+    // {
+    //     printf("\t%.2f", Loutput[i]);
+    // }
+    // printf("\n");
     
 	
 }
