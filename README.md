@@ -6,7 +6,7 @@ Multilayer Perceptron implemented in bare C, OpenMP and OpenCL.
 Three fully connected layers are used. Problem is classification of a handwritten numbers, MLP is trained with Tensorflow's MNIST dataset.
 Only forward propagation is implemented for now.
 
-***Wiki*** will contain theoretical knowledge and methodology, so feel free to check it out.
+[***Wiki***](https://github.com/miloshunter/MLP-OpenCL/wiki) will contain theoretical knowledge and methodology, so feel free to check it out.
 
 ## Expectations
 Hypothesis 1: MLP on CPU programmed with OpenMP will run faster than MLP programmed in bare C
