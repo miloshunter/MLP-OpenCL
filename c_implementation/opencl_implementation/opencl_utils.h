@@ -1,0 +1,40 @@
+#ifndef OPENCL_UTILS
+#define OPENCL_UTILS
+#include <CL/cl.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+cl_int ret;
+cl_platform_id platform_id;
+cl_device_id device_id;   
+cl_uint ret_num_devices;
+cl_uint ret_num_platforms;
+cl_context context;
+cl_command_queue command_queue;
+cl_int ret;
+cl_program program;
+cl_device_id device_id;
+cl_kernel kernel;
+
+size_t global_work_size[3];
+size_t local_item_size[3];
+
+
+void init_opencl();
+
+size_t read_kernel_source(char* source_filename, char** source_string);
+
+void read_and_build_kernel_program(char* source_filename);
+
+void prepare_and_run_kernel(char* kernel_name, size_t args_num,
+                                 void* kernel_args[10], size_t in_len,
+                                 size_t out_len);
+
+
+
+#endif // !OPENCL_UTILS
+
+
+
+
+
