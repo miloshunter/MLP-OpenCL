@@ -76,26 +76,27 @@ void prepare_and_run_kernel(char* kernel_name, size_t args_num,
 
     global_work_size[0] = in_len;
     global_work_size[1] = out_len;
-    local_item_size[0] = in_len;
-    local_item_size[1] = out_len;
-
-    cl_mem w_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 
-            (3*5) * sizeof(double), NULL, &ret);
-    cl_mem x_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 
-            5 * sizeof(double), NULL, &ret);
-    cl_mem l1_mem_obj = clCreateBuffer(context, CL_MEM_WRITE_ONLY, 
-            3 * sizeof(double), NULL, &ret);
-        
+    global_work_size[2] = 1;
+    local_item_size[0] = in_len/2/2/2/2;
+    local_item_size[1] = (out_len/2)%64;
+    local_item_size[2] = 1;
 
     // Set the arguments of the kernel
     for(size_t i = 0; i < args_num; i++)
     {
         ret = clSetKernelArg(kernel, i, sizeof(cl_mem), (void *)&kernel_args[i]);
+        if (ret != CL_SUCCESS) {
+            printf("Could not set Kernel ARG. Error code: %d\n", ret);
+            exit(0);
+        }
     }
-           
     
-    ret = clEnqueueNDRangeKernel(command_queue, kernel, args_num, NULL, 
-            global_work_size, local_item_size, 0, NULL, NULL);
-            
+    printf("Global work size: %d + %d\n", global_work_size[0], global_work_size[1]);
+    ret = clEnqueueNDRangeKernel(command_queue, kernel, args_num-1, NULL, 
+            global_work_size, NULL, 0, NULL, NULL);
+    if (ret != CL_SUCCESS) {
+        printf("Could not Enqueue NDRange kernel. Error code: %d\n", ret);
+        exit(0);
+    }
 
 }
