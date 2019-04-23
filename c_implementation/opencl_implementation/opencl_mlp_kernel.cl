@@ -1,6 +1,6 @@
-__kernel void dense_mul(__global double *input_matrix,
-                        __global double *weights,
-                        __global double *output_matrix){
+__kernel void dense_mul(__global float *input_matrix,
+                        __global float *weights,
+                        __global float *output_matrix){
     int j = get_global_id(0);
     int i = get_global_id(1);
     int width = get_global_size(0);
@@ -9,9 +9,9 @@ __kernel void dense_mul(__global double *input_matrix,
     
 }
 
-__kernel void dense_add(__global double *input_matrix,
-                        __global double *weights,
-                        __global double *output_matrix){
+__kernel void dense_add(__global float *input_matrix,
+                        __global float *weights,
+                        __global float *output_matrix){
     int i = get_global_id(0);
     int j = get_global_id(1);
     int width = get_global_size(0);
@@ -26,7 +26,7 @@ __kernel void dense_add(__global double *input_matrix,
     // printf("Bla %f - %f\n", input_matrix[i], weights[i*width+j]);
 }
 
-__kernel void double_array(__global double *input_matrix){
+__kernel void float_array(__global float *input_matrix){
     int i = get_global_id(0);
 
     printf("%.2f*%.2f = %.2f \n", input_matrix[i],

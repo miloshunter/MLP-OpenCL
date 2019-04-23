@@ -1,18 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "weights/network2/w1.h"
-#include "weights/network2/w2.h"
-#include "weights/network2/w3.h"
-#include "weights/network2/wout.h"
-#include "weights/network2/b1.h"
-#include "weights/network2/b2.h"
-#include "weights/network2/b3.h"
-#include "weights/network2/bout.h"
+#include "weights/network3/w1.h"
+#include "weights/network3/w2.h"
+#include "weights/network3/w3.h"
+#include "weights/network3/wout.h"
+#include "weights/network3/b1.h"
+#include "weights/network3/b2.h"
+#include "weights/network3/b3.h"
+#include "weights/network3/bout.h"
 #include "weights/slike.h"
-#include "weights/network2/layer1.h"
-#include "weights/network2/layer2.h"
-#include "weights/network2/layer3.h"
-#include "weights/network2/output.h"
+#include "weights/network3/layer1.h"
+#include "weights/network3/layer2.h"
+#include "weights/network3/layer3.h"
+#include "weights/network3/output.h"
 #include <math.h>
 #include <assert.h>
 #include <sys/time.h>
@@ -22,11 +22,11 @@
 #define INPUT_SIZE 28*28
 #define CLASS_NUM 10
 
-const int LAYER_SIZE[5] = {784, 2048, 1024, 512, 10};
+const int LAYER_SIZE[5] = {784, 4096, 2048, 2048, 10};
 #define n_input  784
-#define n_layer1  2048
-#define n_layer2  1024
-#define n_layer3  512
+#define n_layer1  4096
+#define n_layer2  2048
+#define n_layer3  2048
 #define n_output  10
 
 static void softmax(double *input, size_t input_len) {
@@ -134,7 +134,7 @@ void forward_propagation(){
 void main()
 {
     
-	load_input(trojka);
+	load_input(sestica);
 
     struct timeval  tv1, tv2;
     gettimeofday(&tv1, NULL);
@@ -143,7 +143,7 @@ void main()
         
     forward_propagation();
         
-
+        
     // }
     gettimeofday(&tv2, NULL);
 
@@ -151,12 +151,12 @@ void main()
          (double) (tv2.tv_usec - tv1.tv_usec) +
          (double) 1000000*(tv2.tv_sec - tv1.tv_sec));
 
-    // printf("Izracunat izlaz: ");
-    // for(size_t i = 0; i < CLASS_NUM; i++)
-    // {
-    //     printf("\t%.2f", Loutput[i]);
-    // }
-    // printf("\n");
+    printf("Izracunat izlaz: ");
+    for(size_t i = 0; i < CLASS_NUM; i++)
+    {
+        printf("\t%.2f", Loutput[i]);
+    }
+    printf("\n");
     
 	
 }

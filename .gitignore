@@ -1,3 +1,12 @@
+# Editors
+*.idea*
+*.vscode*
+*MNIST_data*
+*exported_c_files*
+c_implementation/weights
+*.json
+
+
 # Prerequisites
 *.d
 
