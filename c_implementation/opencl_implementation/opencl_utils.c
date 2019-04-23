@@ -14,7 +14,7 @@ void init_opencl()
     // Create an OpenCL context
     context = clCreateContext( NULL, 1, &device_id, NULL, NULL, &ret);
     if (ret != CL_SUCCESS) {
-        printf("Could not create context. Error code: %d\n", ret);
+        printf("Could not create context.  Error code: %d\n", ret);
         exit(0);
     }
     
@@ -100,3 +100,40 @@ void prepare_and_run_kernel(char* kernel_name, size_t args_num,
     }
 
 }
+
+void copy_weights_and_biases(const int *LAYER_SIZE, float *w1, float *w2, float *w3, float *wout)
+{
+    printf("Kopiram tezine\n");
+    int layer_num = 1;
+    w1_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 
+            (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), NULL, &ret);
+    printf("Kopirao prvu\n");
+
+    ret = clEnqueueWriteBuffer(command_queue, w1_mem_obj, CL_TRUE, 0,
+                                (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), w1, 0, NULL, NULL);
+    layer_num++;
+    printf("Vratio je: ret %d\n", ret);
+
+    w2_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 
+            (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), NULL, &ret);
+    ret = clEnqueueWriteBuffer(command_queue, w1_mem_obj, CL_TRUE, 0,
+                                (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), w2, 0, NULL, NULL);
+    layer_num++;
+    w3_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 
+            (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), NULL, &ret);
+    ret = clEnqueueWriteBuffer(command_queue, w1_mem_obj, CL_TRUE, 0,
+                                (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), w3, 0, NULL, NULL);
+    layer_num++;
+    wout_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 
+            (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), NULL, &ret);
+    ret = clEnqueueWriteBuffer(command_queue, w1_mem_obj, CL_TRUE, 0,
+                                (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), wout, 0, NULL, NULL);                                                                                            
+
+    w_mem_obj_array[0] = w1_mem_obj;
+    w_mem_obj_array[1] = w2_mem_obj;
+    w_mem_obj_array[2] = w3_mem_obj;
+    w_mem_obj_array[3] = wout_mem_obj;
+
+
+}
+

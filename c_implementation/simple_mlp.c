@@ -8,7 +8,7 @@
 #include "weights/network3/b2.h"
 #include "weights/network3/b3.h"
 #include "weights/network3/bout.h"
-#include "weights/slike.h"
+#include "weights/network3/slike.h"
 #include "weights/network3/layer1.h"
 #include "weights/network3/layer2.h"
 #include "weights/network3/layer3.h"
@@ -17,6 +17,8 @@
 #include <assert.h>
 #include <sys/time.h>
 #include <gperftools/profiler.h>
+
+
 
 #define PIC_SIZE 28
 #define INPUT_SIZE 28*28
@@ -29,11 +31,11 @@ const int LAYER_SIZE[5] = {784, 4096, 2048, 2048, 10};
 #define n_layer3  2048
 #define n_output  10
 
-static void softmax(double *input, size_t input_len) {
-    double * Z = input;
+static void softmax(float *input, size_t input_len) {
+    float * Z = input;
     int K = input_len;
 
-    double sum = 0;
+    float sum = 0;
     for(int j = 0; j < K; j++)
     {
         sum += exp(Z[j]);
@@ -46,22 +48,22 @@ static void softmax(double *input, size_t input_len) {
 
 }
 
-static void relu(double *input, int input_len){
+static void relu(float *input, int input_len){
     for(int i = 0; i < input_len; i++)
     {
-        input[i] = fmax((double)0, input[i]);
+        input[i] = fmax((float)0, input[i]);
     }
 }
 
 
 //  Placeholders for calculations
-double input[INPUT_SIZE];
-double L1[n_layer1];
-double L2[n_layer2];
-double L3[n_layer3];
-double Loutput[n_output];
+float input[INPUT_SIZE];
+float L1[n_layer1];
+float L2[n_layer2];
+float L3[n_layer3];
+float Loutput[n_output];
 
-void flatten_image(double ** image)
+void flatten_image(float ** image)
 {
     for(size_t i = 0; i < PIC_SIZE; i++)
     {
@@ -73,8 +75,8 @@ void flatten_image(double ** image)
 }
 
 //  Activation function: 1 - Relu; 2 - softmax
-void calculate_layer(int layer_num, double* input_matrix, double *weights,
-                        double* biases, double* out_matrix, int activation_function)
+void calculate_layer(int layer_num, float* input_matrix, float *weights,
+                        float* biases, float* out_matrix, int activation_function)
 {
     int i, j;
     //printf("Racunanje sloja: %d\n", layer_num);
@@ -102,7 +104,7 @@ void calculate_layer(int layer_num, double* input_matrix, double *weights,
     
 }
 
-void load_input(double* image)
+void load_input(float* image)
 {
 	for (int i = 0; i < n_input; i++)
 	{
@@ -110,9 +112,9 @@ void load_input(double* image)
 	}
 }
 
-void compare_1d_array(double *x, double *y, int length)
+void compare_1d_array(float *x, float *y, int length)
 {
-	double max_error = 0;
+	float max_error = 0;
     int max_index = -1;
 	for (int i = 0; i < length; i++){
 		if (fabs((x[i]-y[i])) > max_error)
@@ -125,16 +127,16 @@ void compare_1d_array(double *x, double *y, int length)
 }
 
 void forward_propagation(){
-    calculate_layer(1, input, (double *)w1, b1, L1, 1);
-    calculate_layer(2, L1, (double *)w2, b2, L2, 1);
-    calculate_layer(3, L2, (double *)w3, b3, L3, 1);
-    calculate_layer(4, L3, (double *)wout, bout, Loutput, 0);
+    calculate_layer(1, input, (float *)w1, b1, L1, 1);
+    calculate_layer(2, L1, (float *)w2, b2, L2, 1);
+    calculate_layer(3, L2, (float *)w3, b3, L3, 1);
+    calculate_layer(4, L3, (float *)wout, bout, Loutput, 0);
 }
 
 void main()
 {
     
-	load_input(sestica);
+	load_input(sedmica);
 
     struct timeval  tv1, tv2;
     gettimeofday(&tv1, NULL);
@@ -147,9 +149,9 @@ void main()
     // }
     gettimeofday(&tv2, NULL);
 
-    printf ("Total time = %f microseconds\n",
-         (double) (tv2.tv_usec - tv1.tv_usec) +
-         (double) 1000000*(tv2.tv_sec - tv1.tv_sec));
+    printf ("Total time = %f microseconds \n",
+         (float) (tv2.tv_usec - tv1.tv_usec) +
+         (float) 1000000*(tv2.tv_sec - tv1.tv_sec));
 
     printf("Izracunat izlaz: ");
     for(size_t i = 0; i < CLASS_NUM; i++)
