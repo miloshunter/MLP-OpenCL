@@ -1,18 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "weights/network3/w1.h"
-#include "weights/network3/w2.h"
-#include "weights/network3/w3.h"
-#include "weights/network3/wout.h"
-#include "weights/network3/b1.h"
-#include "weights/network3/b2.h"
-#include "weights/network3/b3.h"
-#include "weights/network3/bout.h"
-#include "weights/network3/slike.h"
-#include "weights/network3/layer1.h"
-#include "weights/network3/layer2.h"
-#include "weights/network3/layer3.h"
-#include "weights/network3/output.h"
+#include "weights/network2/w1.h"
+#include "weights/network2/w2.h"
+#include "weights/network2/w3.h"
+#include "weights/network2/wout.h"
+#include "weights/network2/b1.h"
+#include "weights/network2/b2.h"
+#include "weights/network2/b3.h"
+#include "weights/network2/bout.h"
+#include "weights/network2/osmica.h"
+// #include "weights/network3/slike.h"
+// #include "weights/network3/layer1.h"
+// #include "weights/network3/layer2.h"
+// #include "weights/network3/layer3.h"
+// #include "weights/network3/output.h"
 #include <math.h>
 #include <assert.h>
 #include <sys/time.h>
@@ -24,11 +25,12 @@
 #define INPUT_SIZE 28*28
 #define CLASS_NUM 10
 
-const int LAYER_SIZE[5] = {784, 4096, 2048, 2048, 10};
+//const int LAYER_SIZE[5] = {784, 4096, 2048, 2048, 10};
+const int LAYER_SIZE[5] = {784, 2048, 1024, 512, 10};
 #define n_input  784
-#define n_layer1  4096
-#define n_layer2  2048
-#define n_layer3  2048
+#define n_layer1  2048
+#define n_layer2  1024
+#define n_layer3  512
 #define n_output  10
 
 static void softmax(float *input, size_t input_len) {
@@ -98,7 +100,7 @@ void calculate_layer(int layer_num, float* input_matrix, float *weights,
 
     if (activation_function == 1) {
         relu(out_matrix, Y);
-    } else {
+    } else if(activation_function == 2) {
         softmax(out_matrix, Y);
     }   
     
@@ -128,15 +130,60 @@ void compare_1d_array(float *x, float *y, int length)
 
 void forward_propagation(){
     calculate_layer(1, input, (float *)w1, b1, L1, 1);
+    for(size_t i = 0; i < 20; i++)
+    {
+        printf("\t%f\n", L1[i]);
+    }
+    
     calculate_layer(2, L1, (float *)w2, b2, L2, 1);
     calculate_layer(3, L2, (float *)w3, b3, L3, 1);
-    calculate_layer(4, L3, (float *)wout, bout, Loutput, 0);
+    calculate_layer(4, L3, (float *)wout, bout, Loutput, 2);
 }
 
 void main()
 {
+
+    //  --- -   -   -   -   -   -   Testing
+    #define N 5
+    printf("Testiranje racunanja matrica!\n");
+    float in_mat[N] = {1, 2, 3, 4, 5};
+    float out_mat[N] = {0, 0, 0, 0, 0};
+    float biases[N] = {0, 0, 0, 0, 0};
+
+    float weights[N][N] = {
+        {1, 1, 1, 1, 1},
+        {2, 2, 2, 2, 2},
+        {3, 3, 3, 3, 3},
+        {4, 4, 4, 4, 4},
+        {5, 5, 5, 5, 5}
+    };
+
+    int X = N;
+    int Y = N;
+    int i, j;
+    #pragma omp parallel private(i,j) shared(Y, X, out_mat, in_mat, weights, biases)
+    {
+        #pragma omp for schedule(static)
+        for(i = 0; i < Y; i++)
+        {
+            for(j = 0; j < X; j++)
+            {
+                out_mat[i] += in_mat[j]* weights[i][j];
+            }
+            out_mat[i] += biases[i];
+        }
+    }
+
+    for(size_t i = 0; i < 5; i++)
+    {
+        printf("\t %.2f", out_mat[i]);
+    }
+    printf("\n");
     
-	load_input(sedmica);
+    //exit(0);
+    //  --- -   -   -   -   -   -   Testing end
+    
+	load_input(osmica);
 
     struct timeval  tv1, tv2;
     gettimeofday(&tv1, NULL);

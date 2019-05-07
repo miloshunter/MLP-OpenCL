@@ -1,5 +1,6 @@
 #include "opencl_utils.h"
 
+
 #define MAX_SOURCE_SIZE (0x10000)
 
 
@@ -65,6 +66,7 @@ void read_and_build_kernel_program(char* source_filename){
         printf("Could not build program. Error code: %d\n", ret);
         exit(0);
     }
+    clFinish(command_queue);
 }
 
 void prepare_and_run_kernel(char* kernel_name, size_t args_num,
@@ -74,13 +76,10 @@ void prepare_and_run_kernel(char* kernel_name, size_t args_num,
     // Create the OpenCL kernel
     kernel = clCreateKernel(program, kernel_name, &ret);
 
-    global_work_size[0] = in_len;
-    global_work_size[1] = out_len;
+    global_work_size[0] = out_len;
+    global_work_size[1] = 1;
     global_work_size[2] = 1;
-    local_item_size[0] = in_len/2/2/2/2;
-    local_item_size[1] = (out_len/2)%64;
-    local_item_size[2] = 1;
-
+    
     // Set the arguments of the kernel
     for(size_t i = 0; i < args_num; i++)
     {
@@ -89,6 +88,11 @@ void prepare_and_run_kernel(char* kernel_name, size_t args_num,
             printf("Could not set Kernel ARG. Error code: %d\n", ret);
             exit(0);
         }
+    }
+    ret = clSetKernelArg(kernel, args_num, sizeof(int), &out_len);
+    if (ret != CL_SUCCESS) {
+        printf("Could not set Kernel ARG. Error code: %d\n", ret);
+        exit(0);
     }
     
     printf("Global work size: %d + %d\n", global_work_size[0], global_work_size[1]);
@@ -116,17 +120,17 @@ void copy_weights_and_biases(const int *LAYER_SIZE, float *w1, float *w2, float 
 
     w2_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 
             (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), NULL, &ret);
-    ret = clEnqueueWriteBuffer(command_queue, w1_mem_obj, CL_TRUE, 0,
+    ret = clEnqueueWriteBuffer(command_queue, w2_mem_obj, CL_TRUE, 0,
                                 (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), w2, 0, NULL, NULL);
     layer_num++;
     w3_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 
             (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), NULL, &ret);
-    ret = clEnqueueWriteBuffer(command_queue, w1_mem_obj, CL_TRUE, 0,
+    ret = clEnqueueWriteBuffer(command_queue, w3_mem_obj, CL_TRUE, 0,
                                 (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), w3, 0, NULL, NULL);
     layer_num++;
     wout_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 
             (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), NULL, &ret);
-    ret = clEnqueueWriteBuffer(command_queue, w1_mem_obj, CL_TRUE, 0,
+    ret = clEnqueueWriteBuffer(command_queue, wout_mem_obj, CL_TRUE, 0,
                                 (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), wout, 0, NULL, NULL);                                                                                            
 
     w_mem_obj_array[0] = w1_mem_obj;
