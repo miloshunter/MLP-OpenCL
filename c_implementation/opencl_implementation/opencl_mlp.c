@@ -4,14 +4,14 @@
 #include <math.h>
 #include <sys/time.h>
 #include "opencl_utils.h"
-#include "../weights/network2/w1.h"
-#include "../weights/network2/b1.h"
-#include "../weights/network2/w2.h"
-#include "../weights/network2/b2.h"
-#include "../weights/network2/w3.h"
-#include "../weights/network2/b3.h"
-#include "../weights/network2/wout.h"
-#include "../weights/network2/bout.h"
+#include "../weights/network3/w1.h"
+#include "../weights/network3/b1.h"
+#include "../weights/network3/w2.h"
+#include "../weights/network3/b2.h"
+#include "../weights/network3/w3.h"
+#include "../weights/network3/b3.h"
+#include "../weights/network3/wout.h"
+#include "../weights/network3/bout.h"
 #include "../weights/slike.h"
 
 #ifdef __APPLE__
@@ -26,15 +26,15 @@
 #define INPUT_SIZE 28*28
 #define CLASS_NUM 10
 
-struct timeval  tv1, tv2;
+struct timeval  tv1, tv2, tv3, tv4;
 struct timeval  tvlaystart, tvlayend;
 
 
-const int LAYER_SIZE[5] = {784, 2048, 1024, 512, 10};
+const int LAYER_SIZE[5] = {784, 4096, 2048, 2048, 10};
 #define n_input  784
-#define n_layer1  2048
-#define n_layer2  1024  
-#define n_layer3  512
+#define n_layer1  4096
+#define n_layer2  2048 
+#define n_layer3  1024
 #define n_output  10
 
 //  Placeholders for calculations
@@ -103,35 +103,66 @@ void calculate_layer(int layer_number, float* input_matrix, float *weights,
     int i, j;
     printf("Calculating layer: %d\n", layer_number);
     
+    gettimeofday(&tv1, NULL);
     int N_IN = LAYER_SIZE[layer_number-1];
     int N_OUT = LAYER_SIZE[layer_number];
-    read_and_build_kernel_program("new_kernel.cl");
 
+    gettimeofday(&tv3, NULL);
     cl_mem in_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY,
                     (N_IN)*sizeof(float), NULL, &ret);
     cl_mem calc_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
                     (N_IN*N_OUT)*sizeof(float), NULL, &ret);
     cl_mem out_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY,
                     (N_OUT)*sizeof(float), NULL, &ret);
+    clFinish(command_queue);
+    gettimeofday(&tv4, NULL);
+    printf ("\tCreating buffers time = %f microseconds \n",
+         (float) (tv4.tv_usec - tv3.tv_usec) +
+         (float) 1000000*(tv4.tv_sec - tv3.tv_sec));
+    gettimeofday(&tv3, NULL);
     ret = clEnqueueWriteBuffer(command_queue, in_mem_obj, CL_TRUE, 0,
                     (N_IN)*sizeof(float), input_matrix, 0, NULL, NULL);
-    printf("Iskopirao...\n");
+    clFinish(command_queue);
+    gettimeofday(&tv4, NULL);
+    printf ("\tWritting input to GPU time = %f microseconds \n",
+         (float) (tv4.tv_usec - tv3.tv_usec) +
+         (float) 1000000*(tv4.tv_sec - tv3.tv_sec));
+    gettimeofday(&tv3, NULL);
     kernel = clCreateKernel(program, "weights_mul", &ret);
+    clFinish(command_queue);
+    gettimeofday(&tv4, NULL);
+    printf ("\tCreating kernel time = %f microseconds \n",
+         (float) (tv4.tv_usec - tv3.tv_usec) +
+         (float) 1000000*(tv4.tv_sec - tv3.tv_sec));
 
+    gettimeofday(&tv3, NULL);
     ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&in_mem_obj);
     ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&w_mem_obj_array[layer_number-1]);
     ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&calc_mem_obj);
+    clFinish(command_queue);
+    gettimeofday(&tv4, NULL);
+    printf ("\tSetting kernel args time = %f microseconds \n",
+         (float) (tv4.tv_usec - tv3.tv_usec) +
+         (float) 1000000*(tv4.tv_sec - tv3.tv_sec));
     
     global_work_size[0] = N_IN;
     global_work_size[1] = N_OUT;
     printf("Global work size: %d + %d\n", 
                 global_work_size[0], global_work_size[1]);
+    gettimeofday(&tv2, NULL);
+    printf ("Prepare mul time = %f microseconds \n",
+         (float) (tv2.tv_usec - tv1.tv_usec) +
+         (float) 1000000*(tv2.tv_sec - tv1.tv_sec));
+    gettimeofday(&tv1, NULL);
     ret = clEnqueueNDRangeKernel(command_queue, kernel, 2, NULL, 
             global_work_size, NULL, 0, NULL, NULL);
     clFinish(command_queue);
+    gettimeofday(&tv2, NULL);
+    printf ("Calculate mul time = %f microseconds \n",
+         (float) (tv2.tv_usec - tv1.tv_usec) +
+         (float) 1000000*(tv2.tv_sec - tv1.tv_sec));
 
-    printf("\nSabiranje izracunatog!\n");
-    read_and_build_kernel_program("add_kernel.cl");
+    gettimeofday(&tv1, NULL);
 
     kernel = clCreateKernel(program, "add_calculated", &ret);
     ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&calc_mem_obj);
@@ -144,19 +175,31 @@ void calculate_layer(int layer_number, float* input_matrix, float *weights,
     ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&num_mem_obj);
     global_work_size[0] = N_OUT;
     clFinish(command_queue);
-
+    gettimeofday(&tv2, NULL);
+    printf ("Prepare add time = %f microseconds \n",
+         (float) (tv2.tv_usec - tv1.tv_usec) +
+         (float) 1000000*(tv2.tv_sec - tv1.tv_sec));
+    gettimeofday(&tv1, NULL);    
     ret = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, 
             global_work_size, NULL, 0, NULL, NULL);
-
+    clFinish(command_queue);
+    gettimeofday(&tv2, NULL);
+    printf ("Calculate add time = %f microseconds \n",
+         (float) (tv2.tv_usec - tv1.tv_usec) +
+         (float) 1000000*(tv2.tv_sec - tv1.tv_sec));
     
+    gettimeofday(&tv1, NULL);    
     ret = clEnqueueReadBuffer(command_queue, out_mem_obj, CL_TRUE, 0, 
             N_OUT * sizeof(float), out_matrix, 0, NULL, NULL);
     if (ret != CL_SUCCESS) {
         printf("Could not Read buffer from GPU. Error code: %d\n", ret);
         exit(0);
     } 
-   
     clFinish(command_queue);
+    gettimeofday(&tv2, NULL);
+    printf ("Read calculated time = %f microseconds \n",
+         (float) (tv2.tv_usec - tv1.tv_usec) +
+         (float) 1000000*(tv2.tv_sec - tv1.tv_sec));
    
     gettimeofday(&tv1, NULL);    
     for(size_t i = 0; i < LAYER_SIZE[layer_number]; i++)
@@ -188,31 +231,31 @@ void calculate_layer(int layer_number, float* input_matrix, float *weights,
     printf ("Total layer time = %f microseconds\n",
          (float) (tvlayend.tv_usec - tvlaystart.tv_usec) +
          (float) 1000000*(tvlayend.tv_sec - tvlaystart.tv_sec));
-    printf("*****************************************");
+    printf("***************************************** ");
 
 }
 
 
 int main(void) {
-    load_input(trojka);
+    load_input(petica);
 
     init_opencl();
-    struct timeval  tv1, tv2;
+    read_and_build_kernel_program("new_kernel.cl");
 
+    struct timeval  tv1, tv2;
 
     copy_weights_and_biases(LAYER_SIZE, (float *)w1, (float *)w2, 
                                 (float *)w3, (float *)wout);
 
     gettimeofday(&tv1, NULL);
 
-    printf("Iskopirao...\n");
     calculate_layer(1, input, (float *)w1, b1, L1, 1);
     calculate_layer(2, L1, (float *)w2, b2, L2, 1);
     calculate_layer(3, L2, (float *)w3, b3, L3, 1);
     calculate_layer(4, L3, (float *)wout, bout, Loutput, 2);
   
     gettimeofday(&tv2, NULL);
-    printf ("\nTotal time = %f microseconds \n",
+    printf ("\nTotal time = %f microseconds\n",
          (float) (tv2.tv_usec - tv1.tv_usec) +
          (float) 1000000*(tv2.tv_sec - tv1.tv_sec));
 

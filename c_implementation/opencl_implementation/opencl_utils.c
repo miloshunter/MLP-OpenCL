@@ -36,7 +36,7 @@ size_t read_kernel_source(char* source_filename, char** source_string){
     
     /* Load the source code containing the kernel*/
     fp = fopen(source_filename, "r");
-    printf("Reading kernel: %s\n", source_filename);
+    // printf("Reading kernel: %s\n", source_filename);
     if (!fp) {
         fprintf(stderr, "Failed to load kernel.\n");
         exit(1);
@@ -107,16 +107,13 @@ void prepare_and_run_kernel(char* kernel_name, size_t args_num,
 
 void copy_weights_and_biases(const int *LAYER_SIZE, float *w1, float *w2, float *w3, float *wout)
 {
-    printf("Kopiram tezine\n");
     int layer_num = 1;
     w1_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 
             (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), NULL, &ret);
-    printf("Kopirao prvu\n");
 
     ret = clEnqueueWriteBuffer(command_queue, w1_mem_obj, CL_TRUE, 0,
                                 (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), w1, 0, NULL, NULL);
     layer_num++;
-    printf("Vratio je: ret %d\n", ret);
 
     w2_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 
             (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), NULL, &ret);
