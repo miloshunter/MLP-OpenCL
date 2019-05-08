@@ -24,3 +24,22 @@ Hypothesis 4: Implementations in OpenCL and Tensorflow should be comparable. Ten
 4) OpenCL implementation, but ran on GPU.
 5) Comparison of results
 6) Conclusion
+
+## Results
+### Hypothesis 1:
+Speedup for OpenMP on CPU depends on the network size but generaly goes from 1.5 on two threads and small networks to around 5 on maximum thread number (Ryzen 5 2600x has 6 cores and 12 threads).
+This hypothesis is proved to be right.
+
+### Hypothesis 2:
+This hypothesis proved right again, but greatly depends on network size.
+
+For small network where CPU speedup is 2.5, GPU speedup is 2.7. For smaller networks probably would be even worse.
+
+But for large network where CPU speedup is 5, GPU speedup is 17.
+
+### Hypothesis 3:
+Size of the network indeed impacts the GPU implementation speedup. It goes from 2.7 on small network to 17 on large network.
+
+### Hypothesis 4:
+Need to check Tensorflow time so this stays unanswered for now. :(
+
