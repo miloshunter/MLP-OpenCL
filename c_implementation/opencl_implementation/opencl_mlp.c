@@ -30,12 +30,13 @@ struct timeval  tv1, tv2, tv3, tv4;
 struct timeval  tvlaystart, tvlayend;
 
 
-const int LAYER_SIZE[5] = {784, 4096, 2048, 2048, 10};
 #define n_input  784
-#define n_layer1  4096
-#define n_layer2  2048 
-#define n_layer3  1024
+#define n_layer1  2048
+#define n_layer2  1024 
+#define n_layer3  512
 #define n_output  10
+const int LAYER_SIZE[5] = {784, n_layer1, n_layer2, n_layer3, n_output};
+
 
 //  Placeholders for calculations
 float input[INPUT_SIZE];
@@ -237,7 +238,7 @@ void calculate_layer(int layer_number, float* input_matrix, float *weights,
 
 
 int main(void) {
-    load_input(petica);
+    load_input(sedmica);
 
     init_opencl();
     read_and_build_kernel_program("new_kernel.cl");
