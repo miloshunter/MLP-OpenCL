@@ -47,7 +47,6 @@ Hypothesis 4: Implementations in OpenCL and Tensorflow should be comparable. Ten
 │       │   ├── w3.h
 │       │   └── wout.h
 │       └── slike.h
-├── MLP-OpenCL-master.zip
 ├── python_training
 │   └── simple_mnist.py
 └── README.md
