@@ -26,7 +26,7 @@ Hypothesis 4: Implementations in OpenCL and Tensorflow should be comparable. Ten
 6) Conclusion
 
 ## File tree at the end of the project
-`
+`C
 ├── c_implementation
 │   ├── opencl_implementation
 │   │   ├── new_kernel.cl
