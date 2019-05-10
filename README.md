@@ -26,7 +26,7 @@ Hypothesis 4: Implementations in OpenCL and Tensorflow should be comparable. Ten
 6) Conclusion
 
 ## File tree at the end of the project
-`C
+```C
 ├── c_implementation
 │   ├── opencl_implementation
 │   │   ├── new_kernel.cl
@@ -51,7 +51,7 @@ Hypothesis 4: Implementations in OpenCL and Tensorflow should be comparable. Ten
 ├── python_training
 │   └── simple_mnist.py
 └── README.md
-`
+```
 ## Results
 ### Hypothesis 1:
 _MLP on CPU programmed with OpenMP will run faster than MLP programmed in bare C_
