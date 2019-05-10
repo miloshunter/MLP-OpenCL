@@ -35,7 +35,7 @@ struct timeval  tvlaystart, tvlayend;
 #define n_layer2  1024 
 #define n_layer3  512
 #define n_output  10
-const int LAYER_SIZE[5] = {784, n_layer1, n_layer2, n_layer3, n_output};
+const int LAYER_SIZE[5] = {n_input, n_layer1, n_layer2, n_layer3, n_output};
 
 
 //  Placeholders for calculations

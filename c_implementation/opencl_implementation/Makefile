@@ -17,7 +17,7 @@ $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 opencl_mlp: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS) ../weights/network3/*.o opencl_utils.c ../weights/slike.o
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS) ../weights/network2/*.o opencl_utils.c ../weights/slike.o
 
 opencl_utils.o:
 	gcc -c opencl_utils.c
