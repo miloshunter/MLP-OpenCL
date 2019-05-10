@@ -25,6 +25,33 @@ Hypothesis 4: Implementations in OpenCL and Tensorflow should be comparable. Ten
 5) Comparison of results
 6) Conclusion
 
+## File tree at the end of the project
+.
+├── c_implementation
+│   ├── opencl_implementation
+│   │   ├── new_kernel.cl
+│   │   ├── opencl_mlp.c
+│   │   ├── opencl_utils.c
+│   │   ├── opencl_utils.h
+│   │   └── test_kernel.c
+│   ├── simple_mlp.c
+│   └── weights
+│       ├── network1
+│       │   ├── b1.h
+│       │   ├── b2.h
+│       │   ├── b3.h
+│       │   ├── bout.h
+│       │   ├── output.h
+│       │   ├── w1.h
+│       │   ├── w2.h
+│       │   ├── w3.h
+│       │   └── wout.h
+│       └── slike.h
+├── MLP-OpenCL-master.zip
+├── python_training
+│   └── simple_mnist.py
+└── README.md
+
 ## Results
 ### Hypothesis 1:
 _MLP on CPU programmed with OpenMP will run faster than MLP programmed in bare C_
@@ -50,4 +77,3 @@ Size of the network indeed impacts the GPU implementation speedup. It goes from 
 _Implementations in OpenCL and Tensorflow should be comparable_
 
 Need to check Tensorflow time so this stays unanswered for now. :(
-
