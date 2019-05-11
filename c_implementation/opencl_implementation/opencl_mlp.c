@@ -31,9 +31,9 @@ struct timeval  tvlaystart, tvlayend;
 
 
 #define n_input  784
-#define n_layer1  2048
-#define n_layer2  1024 
-#define n_layer3  512
+#define n_layer1  4096
+#define n_layer2  2048 
+#define n_layer3  2048
 #define n_output  10
 const int LAYER_SIZE[5] = {n_input, n_layer1, n_layer2, n_layer3, n_output};
 
@@ -238,7 +238,7 @@ void calculate_layer(int layer_number, float* input_matrix, float *weights,
 
 
 int main(void) {
-    load_input(sedmica);
+    load_input(dvojka);
 
     init_opencl();
     read_and_build_kernel_program("new_kernel.cl");

@@ -1,6 +1,5 @@
 import tensorflow as tf
 import numpy as np
-from skimage import io
 from tensorflow.examples.tutorials.mnist import input_data
 from tensorflow.python.client import timeline
 import time
@@ -12,13 +11,13 @@ def save_2d_array_c(array, name):
     file = open("exported_c_files/"+name+".h", "w")
     file.writelines("//Testiranje ispisa\n")
     file.writelines("//Niz je: " + str(array.shape) + "\n")
-    file.writelines("extern double "+name+"["+
+    file.writelines("extern float "+name+"["+
                     str(array.shape[1])+"]["+str(array.shape[0])+
                     "];\n")
     file.close()
 
     file = open("exported_c_files/"+name+".c", "w")
-    file.writelines("double "+name+"[" +
+    file.writelines("float "+name+"[" +
                     str(array.shape[1]) + "][" + str(array.shape[0]) +
                     "] = {\n")
 
@@ -58,12 +57,12 @@ def save_1d_array_c(array, name):
     file = open("exported_c_files/"+name+".h", "w")
     file.writelines("//Testiranje ispisa\n")
     file.writelines("//Niz je: " + str(array.shape) + "\n")
-    file.writelines("extern double "+name+"["+
+    file.writelines("extern float "+name+"["+
                     str(array.shape[0])+
                     "];\n")
     file.close()
     file = open("exported_c_files/"+name+".c", "w")
-    file.writelines("double " + name + "[" +
+    file.writelines("float " + name + "[" +
                     str(array.shape[0]) +
                     "] = {\n")
     for j in range(array.shape[0]):
@@ -74,9 +73,6 @@ def save_1d_array_c(array, name):
     file.close()
 
 
-image_name = 'osmica'
-im = io.imread('test_pics/'+image_name+'.png', as_gray=True)
-im = 1 - im
 
 
 with tf.Session() as sess:
@@ -90,9 +86,9 @@ with tf.Session() as sess:
     layer_num = 4
 
     n_input = 784
-    n_hidden1 = 2048
-    n_hidden2 = 1024
-    n_hidden3 = 512
+    n_hidden1 = 128
+    n_hidden2 = 64
+    n_hidden3 = 32
     n_output = 10
 
     learning_rate = 1e-4
@@ -139,7 +135,7 @@ with tf.Session() as sess:
 
     # Training
     # train on mini batches
-    for epoch in range(20):
+    for epoch in range(5):
         for i in range(n_iterations):
             batch_x, batch_y = mnist.train.next_batch(batch_size)
             sess.run(train_step, feed_dict={
@@ -155,13 +151,13 @@ with tf.Session() as sess:
 
         test_accuracy = sess.run(accuracy, feed_dict={X: mnist.test.images, Y: mnist.test.labels, keep_prob: 1.0})
         print("Accuracy on test set:", test_accuracy)
-
+    '''
     ulaz = np.array(im)
     y = ulaz.reshape(784)
     save_1d_array_c(y, image_name)
-
+    '''
     save_c_weights()
-    save_c_layers()
+    '''save_c_layers()
     t0 = time.time()
     # Create the Timeline object, and write it to a json
     prediction = sess.run(output_layer, feed_dict={X: [y]}, options=run_options, run_metadata=run_metadata)
@@ -179,4 +175,5 @@ with tf.Session() as sess:
 
 
 
+	'''
 

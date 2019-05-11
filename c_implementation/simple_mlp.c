@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "weights/network2/w1.h"
-#include "weights/network2/w2.h"
-#include "weights/network2/w3.h"
-#include "weights/network2/wout.h"
-#include "weights/network2/b1.h"
-#include "weights/network2/b2.h"
-#include "weights/network2/b3.h"
-#include "weights/network2/bout.h"
+#include "weights/network3/w1.h"
+#include "weights/network3/w2.h"
+#include "weights/network3/w3.h"
+#include "weights/network3/wout.h"
+#include "weights/network3/b1.h"
+#include "weights/network3/b2.h"
+#include "weights/network3/b3.h"
+#include "weights/network3/bout.h"
 #include "weights/slike.h"
 
 #include <math.h>
@@ -20,9 +20,9 @@
 #define CLASS_NUM 10
 
 #define n_input  784
-#define n_layer1  2048
-#define n_layer2  1024 
-#define n_layer3  512
+#define n_layer1  4096
+#define n_layer2  2048 
+#define n_layer3  2048
 #define n_output  10
 const int LAYER_SIZE[5] = {n_input, n_layer1, n_layer2, n_layer3, n_output};
 
@@ -131,7 +131,7 @@ void forward_propagation(){
 void main()
 {
  
-	load_input(sestica);
+	load_input(dvojka);
 
     struct timeval  tv1, tv2;
     gettimeofday(&tv1, NULL);
