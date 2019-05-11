@@ -48,6 +48,15 @@ void skip_line(FILE *file){
     while(getc(file) != '\n');
 }
 
+void print_network_config(int layer_num, int *layer_sizes)
+{
+    printf("\nLayer sizes are: \n");
+    for(int i=0; i<layer_num+1; i++){
+        printf("\tLayer %d: %d\n", i, layer_sizes[i]);
+    }
+    printf("\n");
+}
+
 void read_config(char* filename, int *array_sizes)
 {
     FILE *fp;
@@ -67,7 +76,6 @@ void read_config(char* filename, int *array_sizes)
     for(int i=0; i<LAYER_NUM+1; i++){
         read = getline(&line, &len, fp);
         int num = strtol(line, NULL, 10);
-        printf("%d\n", num);
         array_sizes[i] = num;
     }
 }
@@ -82,14 +90,27 @@ int main(int argc, char **argv)
     int layer_sizes[LAYER_NUM];
     read_config(network_name, layer_sizes);
 
+    print_network_config(LAYER_NUM, layer_sizes);
     // Placeholders
-    float **weights;
+    float ***weights;
 
-    for(int i; i<LAYER_NUM+5; i++){
-        weights[i] = (float*) malloc(layer_sizes[i]*sizeof(float));
+    weights = (float***) malloc((LAYER_NUM)*sizeof(float**));
+    printf("\nAllocated %d ** pointers\n", LAYER_NUM);
+    for(int n=0; n<LAYER_NUM; n++){
+        printf("\tAllocated %d ** pointers each %d floats for layer %d\n", layer_sizes[n+1], layer_sizes[n], n);
+        weights[n] = (float**) malloc((layer_sizes[n+1])*sizeof(float*));
+        for(int i=0; i<layer_sizes[n+1]; i++){
+            weights[n][i] = (float*) malloc((layer_sizes[n])*sizeof(float));
+        }
     }
 
-    read_weights(network_name, weights, layer_sizes);
+    printf("Neki element %f\n", weights[4][9][783]);
+
+    //read_weights(network_name, weights, layer_sizes);
 
 
 }
+
+
+
+
