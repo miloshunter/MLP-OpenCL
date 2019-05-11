@@ -33,23 +33,14 @@ Hypothesis 4: Implementations in OpenCL and Tensorflow should be comparable. Ten
 │   │   ├── opencl_mlp.c
 │   │   ├── opencl_utils.c
 │   │   ├── opencl_utils.h
-│   │   └── test_kernel.c
 │   ├── simple_mlp.c
 │   └── weights
 │       ├── network1
-│       │   ├── b1.h
-│       │   ├── b2.h
-│       │   ├── b3.h
-│       │   ├── bout.h
-│       │   ├── output.h
-│       │   ├── w1.h
-│       │   ├── w2.h
-│       │   ├── w3.h
-│       │   └── wout.h
-│       └── slike.h
+│       │   ├── network_parameters.bin
 ├── python_training
 │   └── simple_mnist.py
 └── README.md
+└── network1.conf
 ```
 ## Results
 ### Hypothesis 1:
