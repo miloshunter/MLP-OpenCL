@@ -1,17 +1,17 @@
 CONF?=network.conf
-EPOCH?=10
+EPOCH?=5
 export CONF
 export EPOCH
 
-all: train
+all: train run_openmp
 
 train:	
 	cd python_training && $(MAKE)
 
-generate:
-	@echo "Creating empty txt files..."
-	touch file-{1..10}.txt
-	
+run_openmp:
+	cd c_implementation && $(MAKE)
+
+
 clean:
 	@echo "Cleaning up..."
 	@rm -f parameters/*.bin

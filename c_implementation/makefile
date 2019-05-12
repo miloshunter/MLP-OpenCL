@@ -1,5 +1,5 @@
 CONF?=mlp.conf
-IMG?=../test_pics/8.png
+IMG?=8.png
 
 CC=gcc
 CFLAGS=-I$(IDIR) -g -O0

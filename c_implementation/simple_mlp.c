@@ -61,15 +61,19 @@ void forward_propagation(int layer_num, int *layer_size,float ***weights,
     for (size_t i = 0; i < layer_num; i++)
     {
         L[i] = (float*) calloc(layer_size[i+1], sizeof(float));
-        printf("Allocating %d floats for layer %d\n", layer_size[i+1], i);
+        // printf("Allocating %d floats for layer %d\n", layer_size[i+1], i);
     }
     
-    calculate_layer(1, layer_size, input, weights[0], biases[0], L[0], 1);    
-    calculate_layer(2, layer_size, L[0], weights[1], biases[1], L[1], 1);
-    calculate_layer(3, layer_size, L[1], weights[2], biases[2], L[2], 1);
-    calculate_layer(4, layer_size, L[2], weights[3], biases[3], L[3], 2);
+    calculate_layer(1, layer_size, input, weights[0], biases[0], L[0], 1); 
+    for (size_t i = 1; i < layer_num; i++)
+    {
+        int act_fn = 1;
+        if(i==layer_num-1) act_fn = 2;
+        calculate_layer(i+1, layer_size, L[i-1], 
+                        weights[i], biases[i], L[i], act_fn);
+    }
 
-    (*output) = L[3];
+    (*output) = L[layer_num-1];
 
 }
 
@@ -84,7 +88,9 @@ void main(int argc, char **argv)
                             &weights, &biases);
 
     float *flatten_image;
-    read_png_file(argv[2], &flatten_image);
+    char tmp[50];
+    sprintf(tmp, "../test_pics/%s", argv[2]);
+    read_png_file(tmp, &flatten_image);
 
     struct timeval  tv1, tv2;
     gettimeofday(&tv1, NULL);
@@ -98,10 +104,15 @@ void main(int argc, char **argv)
          (float) (tv2.tv_usec - tv1.tv_usec) +
          (float) 1000000*(tv2.tv_sec - tv1.tv_sec));
 
-    printf("Izracunat izlaz: ");
+    printf("Izracunat izlaz: \n");
     for(size_t i = 0; i < layer_sizes[layer_num]; i++)
     {
-        printf("\t%.2f", output[i]);
+        printf("  %d\t", i);
+    }
+    printf("\n");
+    for(size_t i = 0; i < layer_sizes[layer_num]; i++)
+    {
+        printf("%.2f\t", output[i]);
     }
     printf("\n");
     	

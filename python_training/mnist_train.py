@@ -35,7 +35,7 @@ def print_conf():
     print()
     print("\t	Input : " + str(layer_sizes[0]))
     for i in range(layer_num):
-        print("\t	Layer %d : %s", i, str(layer_sizes[i+1]))
+        print("\t	Layer "+str(i+1)+" : "+ str(layer_sizes[i+1]))
 
 
 def save_2d_array(w_array, name, w_type="ab"):
@@ -136,6 +136,6 @@ with tf.Session() as sess:
                 )
 
         test_accuracy = sess.run(accuracy, feed_dict={X: mnist.test.images, Y: mnist.test.labels, keep_prob: 1.0})
-        print("Accuracy on MNIST test set:", test_accuracy)
+        print("Accuracy on MNIST test set, epoch ",epoch+1," : ", test_accuracy)
 
     save_parameters_binary()
