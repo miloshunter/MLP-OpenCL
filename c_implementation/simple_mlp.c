@@ -3,7 +3,7 @@
 #include <math.h>
 #include <assert.h>
 #include <sys/time.h>
-#include <gperftools/profiler.h>
+// #include <gperftools/profiler.h>
 #include "load_parameters.h"
 #include "read_image.h"
 
@@ -100,7 +100,7 @@ void main(int argc, char **argv)
 
     gettimeofday(&tv2, NULL);
 
-    printf ("Total time = %f microseconds \n",
+    printf ("Total time using OpenMP = %f microseconds \n",
          (float) (tv2.tv_usec - tv1.tv_usec) +
          (float) 1000000*(tv2.tv_sec - tv1.tv_sec));
 
