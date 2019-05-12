@@ -8,6 +8,7 @@ c_implementation/opencl_implementation/opencl_mlp
 c_implementation/simple_mlp.o
 c_implementation/opencl_implementation/test
 parameters/*
+test_pics/
 *.json
 
 

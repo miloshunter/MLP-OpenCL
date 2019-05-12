@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "load_parameters.h"
 #include <math.h>
 #include <assert.h>
 #include <sys/time.h>
 #include <gperftools/profiler.h>
+#include "load_parameters.h"
+#include "read_image.h"
 
 #define PIC_SIZE 28
 #define INPUT_SIZE 28*28
@@ -129,7 +130,8 @@ void main(int argc, char **argv)
     int layer_num = load_parameters(network_name, &layer_sizes, 
                             &weights, &biases);
 
-	// load_input();
+    float *flatten_image;
+    read_png_file(argv[2], &flatten_image);
 
     struct timeval  tv1, tv2;
     gettimeofday(&tv1, NULL);

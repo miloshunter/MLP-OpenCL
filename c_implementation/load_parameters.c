@@ -6,7 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#define DEBUG
+// #define DEBUG
 
 
 void read_config(char* filename, int **array_sizes, int *layer_number)
