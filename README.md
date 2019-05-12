@@ -28,19 +28,33 @@ Hypothesis 4: Implementations in OpenCL and Tensorflow should be comparable. Ten
 ## File tree at the end of the project
 ```C
 ├── c_implementation
+│   ├── load_parameters.c
+│   ├── load_parameters.h
+│   ├── makefile
 │   ├── opencl_implementation
+│   │   ├── makefile
 │   │   ├── new_kernel.cl
 │   │   ├── opencl_mlp.c
 │   │   ├── opencl_utils.c
 │   │   ├── opencl_utils.h
-│   ├── simple_mlp.c
-│   └── weights
-│       ├── network1
-│       │   ├── network_parameters.bin
+│   │   └── test_kernel.c
+│   ├── read_image.c
+│   ├── read_image.h
+│   └── simple_mlp.c
+├── default.conf
+├── LICENSE
+├── makefile
+├── parameters
 ├── python_training
-│   └── simple_mnist.py
-└── README.md
-└── network1.conf
+│   ├── makefile
+│   ├── MNIST_data
+│   │   ├── t10k-images-idx3-ubyte.gz
+│   │   ├── t10k-labels-idx1-ubyte.gz
+│   │   ├── train-images-idx3-ubyte.gz
+│   │   └── train-labels-idx1-ubyte.gz
+│   ├── mnist_train.py
+│   └── requirements.txt
+├── README.md
 ```
 ## Results
 ### Hypothesis 1:
