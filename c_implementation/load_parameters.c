@@ -130,6 +130,7 @@ int load_parameters(char* network_name, int ** ls_adr,
     }
 #endif // DEBUG
     
+    print_network_config(layer_num, layer_sizes);
     return layer_num;
 }
 

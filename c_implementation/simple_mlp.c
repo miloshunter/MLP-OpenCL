@@ -12,9 +12,9 @@
 #define CLASS_NUM 10
 
 #define n_input  784
-#define n_layer1  4096
-#define n_layer2  2048 
-#define n_layer3  2048
+#define n_layer1  2048
+#define n_layer2  1024 
+#define n_layer3  512
 #define n_output  10
 const int LAYER_SIZE[5] = {n_input, n_layer1, n_layer2, n_layer3, n_output};
 
@@ -62,13 +62,12 @@ void flatten_image(float ** image)
 }
 
 //  Activation function: 1 - Relu; 2 - softmax
-void calculate_layer(int layer_num, float* input_matrix, float *weights,
+void calculate_layer(int layer_num, int*layer_size, float* input_matrix, float **weights,
                         float* biases, float* out_matrix, int activation_function)
 {
     int i, j;
-    //printf("Racunanje sloja: %d\n", layer_num);
-    int X = LAYER_SIZE[layer_num-1];
-    int Y = LAYER_SIZE[layer_num];
+    int X = layer_size[layer_num-1];
+    int Y = layer_size[layer_num];
     int x = 20, y=10;
     #pragma omp parallel private(i,j) shared(Y, X, out_matrix, input_matrix, weights, biases)
     {
@@ -77,7 +76,7 @@ void calculate_layer(int layer_num, float* input_matrix, float *weights,
         {
             for(j = 0; j < X; j++)
             {
-                out_matrix[i] += input_matrix[j]* (*((weights+i*X) + j));
+                out_matrix[i] += input_matrix[j]* (weights[i][j]);
             }
             out_matrix[i] += biases[i];
         }
@@ -113,12 +112,13 @@ void compare_1d_array(float *x, float *y, int length)
 	printf("Max error = %f on index %d\n", max_error, max_index);
 }
 
-// void forward_propagation(){
-//     calculate_layer(1, input, (float *)w1, b1, L1, 1);    
-//     calculate_layer(2, L1, (float *)w2, b2, L2, 1);
-//     calculate_layer(3, L2, (float *)w3, b3, L3, 1);
-//     calculate_layer(4, L3, (float *)wout, bout, Loutput, 2);
-// }
+void forward_propagation(int *layer_size,float ***weights, 
+                            float **biases, float *input){
+    calculate_layer(1, layer_size, input, (float *)weights[0], biases[0], L1, 1);    
+    calculate_layer(2, layer_size, L1, (float *)weights[1], biases[1], L2, 1);
+    calculate_layer(3, layer_size, L2, (float *)weights[2], biases[2], L3, 1);
+    calculate_layer(4, layer_size, L3, (float *)weights[3], biases[3], Loutput, 2);
+}
 
 void main(int argc, char **argv)
 {
@@ -136,7 +136,7 @@ void main(int argc, char **argv)
     struct timeval  tv1, tv2;
     gettimeofday(&tv1, NULL);
    
-    // forward_propagation();
+    forward_propagation(layer_sizes, weights, biases, flatten_image);
 
     gettimeofday(&tv2, NULL);
 
