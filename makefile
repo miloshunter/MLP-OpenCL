@@ -1,5 +1,7 @@
 CONF?=network.conf
+EPOCH?=10
 export CONF
+export EPOCH
 
 all: train
 

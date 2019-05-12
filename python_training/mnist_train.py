@@ -7,10 +7,9 @@ import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 tf.logging.set_verbosity(tf.logging.ERROR)
 
-
-EPOCH_NUMBER = 2
-
 NETWORK_NAME = str(sys.argv[1])
+EPOCH_NUMBER = int(sys.argv[2])
+
 
 layer_num = 0
 layer_sizes = []
@@ -137,6 +136,6 @@ with tf.Session() as sess:
                 )
 
         test_accuracy = sess.run(accuracy, feed_dict={X: mnist.test.images, Y: mnist.test.labels, keep_prob: 1.0})
-        print("Accuracy on test set:", test_accuracy)
+        print("Accuracy on MNIST test set:", test_accuracy)
 
     save_parameters_binary()
