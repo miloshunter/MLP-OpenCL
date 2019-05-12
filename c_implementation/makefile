@@ -1,5 +1,5 @@
 CONF?=mlp.conf
-IMG?=8.png
+IMG?=4.png
 
 CC=gcc
 CFLAGS=-I$(IDIR) -g -O0
@@ -23,4 +23,5 @@ read_image.o: read_image.c
 
 clean:
 	@rm -f *.o
+	@rm -f *.gch
 	@cd opencl_implementation && make clean
