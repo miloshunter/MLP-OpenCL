@@ -6,6 +6,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#define DEBUG
+
 
 void read_config(char* filename, int **array_sizes, int *layer_number)
 {
@@ -59,7 +61,9 @@ void read_parameters(char* filename, float ***weights,
         printf("Cannot open file: %s\n", tmp);
         exit(-1);
     }
+#ifdef DEBUG
     print_network_config(layer_num, sizes);
+#endif // DEBUG
     for(int n=0; n<layer_num; n++){
         for(int i=0; i<sizes[n+1]; i++){
             for(int j=0; j<sizes[n]; j++){
@@ -84,30 +88,34 @@ void skip_line(FILE *file){
     while(getc(file) != '\n');
 }
 
-int load_parameters(char* network_name, int* layer_sizes, 
-                        float **** w, float *** b)
+int load_parameters(char* network_name, int ** ls_adr, 
+                        float **** weights_adr, float *** biases_adr)
 {
 
     printf("Reading parameters for: %s\n", network_name);
     int layer_num;
 
-    read_config(network_name, &layer_sizes, &layer_num);
+    int *layer_sizes;
 
-    float ***weights = *weights;
-    weights = (float***) malloc((layer_num)*sizeof(float**));
-    printf("\nAllocated %d ** pointers for Weights\n", layer_num);
+    read_config(network_name, &layer_sizes, &layer_num);
+    (*ls_adr) = layer_sizes;
+    
+    (*weights_adr) = (float***) malloc((layer_num)*sizeof(float**));
+    float ***weights = (*weights_adr);
+
+    // printf("\nAllocated %d ** pointers for Weights\n", layer_num);
     for(int n=0; n<layer_num; n++){
-        printf("\tAllocated %d * pointers each %d floats for layer %d\n", layer_sizes[n+1], layer_sizes[n], n);
+        // printf("\tAllocated %d * pointers each %d floats for layer %d\n", layer_sizes[n+1], layer_sizes[n], n);
         weights[n] = (float**) malloc((layer_sizes[n+1])*sizeof(float*));
         for(int i=0; i<layer_sizes[n+1]; i++){
             weights[n][i] = (float*) malloc((layer_sizes[n])*sizeof(float));
         }
     }
-    float **biases = *b;
-    biases = (float**) malloc((layer_num)*sizeof(float*));
-    printf("\nAllocated %d * pointers for Biases\n", layer_num);
+    (*biases_adr) = (float**) malloc((layer_num)*sizeof(float*));
+    float **biases = (*biases_adr);
+    // printf("\nAllocated %d * pointers for Biases\n", layer_num);
     for(int n=0; n<layer_num; n++){
-        printf("\tAllocated %d floats for layer %d\n", layer_sizes[n+1], n);
+        // printf("\tAllocated %d floats for layer %d\n", layer_sizes[n+1], n);
         biases[n] = (float*) malloc((layer_sizes[n+1])*sizeof(float));
     }
 
@@ -115,11 +123,14 @@ int load_parameters(char* network_name, int* layer_sizes,
 
     // Print weights and biases for testing
 
-
+#ifdef DEBUG
     int n = layer_num-1;
     for(int i=0; i<layer_sizes[n+1]; i++){
         printf("\t %f\n", biases[n][i]);
     }
+#endif // DEBUG
+    
+    return layer_num;
 }
 
 

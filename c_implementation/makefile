@@ -5,8 +5,10 @@ CFLAGS=-I$(IDIR) -g -O0
 
 LIBS=-lm -fopenmp
 
+all: simple_mlp.o
+	./simple_mlp.o mlp.conf
 
-load_parameters.o: load_parameters.c
+load_parameters.o: load_parameters.c load_parameters.h
 	$(CC) -c $^
 
 simple_mlp.o: simple_mlp.c load_parameters.o

@@ -123,9 +123,12 @@ void main(int argc, char **argv)
 {
     char *network_name = argv[1];
     int *layer_sizes;
+    float ***weights;
+    float **biases;
 
-    load_parameters(network_name, layer_sizes);
- 
+    int layer_num = load_parameters(network_name, &layer_sizes, 
+                            &weights, &biases);
+
 	// load_input();
 
     struct timeval  tv1, tv2;
