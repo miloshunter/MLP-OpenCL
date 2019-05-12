@@ -12,59 +12,61 @@ EPOCH_NUMBER = 2
 
 NETWORK_NAME = str(sys.argv[1])
 
-layer_num = 4
-n_input = 0
-n_hidden1 = 0
-n_hidden2 = 0
-n_hidden3 = 0
-n_output = 0
+layer_num = 0
+layer_sizes = []
 
 
 def read_network_conf(network_name):
     conf_file_name = network_name
-    global n_input, n_hidden1, n_hidden2, n_hidden3, n_output
+    global layer_num, layer_sizes
     conf_file = open("../"+conf_file_name)
-    for _ in range(5): conf_file.readline()
-    n_input = int(conf_file.readline().split()[0])
-    n_hidden1 = int(conf_file.readline().split()[0])
-    n_hidden2 = int(conf_file.readline().split()[0])
-    n_hidden3 = int(conf_file.readline().split()[0])
-    n_output = int(conf_file.readline().split()[0])
+    if conf_file is None:
+        print("Cannot read file!")
+        exit()
+    for _ in range(3): conf_file.readline()
+    layer_num = int(conf_file.readline().split()[0])
+    conf_file.readline()
+    for _ in range(layer_num+1):
+        layer_sizes.append(int(conf_file.readline().split()[0]))
 
 
 def print_conf():
     print("\n\n**********************************************************\n")
     print("\t	" + str(NETWORK_NAME) + "  is going to be trained.")
     print()
-    print("\t	Input : " + str(n_input))
-    print("\t	Hidden 1 : " + str(n_hidden1))
-    print("\t	Hidden 2 : " + str(n_hidden2))
-    print("\t	Hidden 3 : " + str(n_hidden3))
-    print("\t	Output : " + str(n_output) + "\n")
+    print("\t	Input : " + str(layer_sizes[0]))
+    for i in range(layer_num):
+        print("\t	Layer %d : %s", i, str(layer_sizes[i+1]))
 
 
-def save_2d_array_c(w_array, name, w_type="ab"):
+def save_2d_array(w_array, name, w_type="ab"):
     file = open("../parameters/"+NETWORK_NAME[0:-5]+"_weights.bin", w_type)
     for i in range(w_array.shape[1]):
         tmp = w_array[:, i]
         for j in range(w_array.shape[0]):
-            #file.writelines(bytearray(tmp[j]))
-            tmp.tofile(file)
+            tmp[j].tofile(file)
     file.close()
 
 
-def save_c_weights():
+def save_1d_array(w_array, name, w_type="ab"):
+    file = open("../parameters/"+NETWORK_NAME[0:-5]+"_weights.bin", w_type)
+    for i in range(w_array.shape[0]):
+        tmp = w_array[i]
+        tmp.tofile(file)
+        #print(tmp)
+    #print()
+    file.close()
+
+
+def save_parameters_binary():
     print("\nSaved weights and biases to: parameters/"+
             NETWORK_NAME[0:-5] +"_weights.bin\n")
-    save_2d_array_c(weights["w1"].eval(), "w1", w_type="wb")
-    save_2d_array_c(weights["w2"].eval(), "w2")
-    save_2d_array_c(weights["w3"].eval(), "w3")
-    save_2d_array_c(weights["wout"].eval(), "wout")
+    save_2d_array(weights[0].eval(), "w", w_type="wb")
+    for i in range(1, layer_num):
+        save_2d_array(weights[i].eval(), "w2")
+    for i in range(0, layer_num):
+        save_1d_array(biases[i].eval(), "b1")
 
-    # save_1d_array_c(biases["b1"].eval(), "b1")
-    # save_1d_array_c(biases["b2"].eval(), "b2")
-    # save_1d_array_c(biases["b3"].eval(), "b3")
-    # save_1d_array_c(biases["bout"].eval(), "bout")
 
 
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
@@ -85,28 +87,24 @@ with tf.Session() as sess:
 
     # building the TensorFlow Graph
 
-    X = tf.placeholder("float", [None, n_input])
-    Y = tf.placeholder("float", [None, n_output])
+    X = tf.placeholder("float", [None, layer_sizes[0]])
+    Y = tf.placeholder("float", [None, layer_sizes[layer_num]])
     keep_prob = tf.placeholder(tf.float32)
 
-    weights = {
-        'w1': tf.Variable(tf.truncated_normal([n_input, n_hidden1], stddev=0.1)),
-        'w2': tf.Variable(tf.truncated_normal([n_hidden1, n_hidden2], stddev=0.1)),
-        'w3': tf.Variable(tf.truncated_normal([n_hidden2, n_hidden3], stddev=0.1)),
-        'wout': tf.Variable(tf.truncated_normal([n_hidden3, n_output], stddev=0.1)),
-    }
-    biases = {
-        'b1': tf.Variable(tf.constant(0.1, shape=[n_hidden1])),
-        'b2': tf.Variable(tf.constant(0.1, shape=[n_hidden2])),
-        'b3': tf.Variable(tf.constant(0.1, shape=[n_hidden3])),
-        'bout': tf.Variable(tf.constant(0.1, shape=[n_output]))
-    }
-
-    layer_1 = tf.nn.relu(tf.add(tf.matmul(X, weights['w1']), biases['b1']))
-    layer_2 = tf.nn.relu(tf.add(tf.matmul(layer_1, weights['w2']), biases['b2']))
-    layer_3 = tf.nn.relu(tf.add(tf.matmul(layer_2, weights['w3']), biases['b3']))
-    layer_drop = tf.nn.dropout(layer_3, keep_prob)
-    output_layer = tf.nn.softmax(tf.matmul(layer_3, weights['wout']) + biases['bout'])
+    weights = []
+    biases = []
+    for n in range(layer_num):
+        weights.append(tf.Variable(tf.truncated_normal([layer_sizes[n], layer_sizes[n+1]], stddev=0.1)))
+        biases.append(tf.Variable(tf.constant(0.1, shape=[layer_sizes[n+1]])))
+    print("Number of layers: " + str(layer_num))
+    print("Layer 1 Size " + str(layer_sizes[0+1]))
+    tmp = tf.nn.relu(tf.add(tf.matmul(X, weights[0]), biases[0]))
+    for n in range(1, layer_num-1):
+        print("Layer " + str(n+1) + " Size " + str(layer_sizes[n+1]))
+        tmp = tf.nn.relu(tf.add(tf.matmul(tmp, weights[n]), biases[n]))
+    layer_drop = tf.nn.dropout(tmp, keep_prob)
+    print("Output " + str(layer_num-1) + " Size " + str(layer_sizes[layer_num]))
+    output_layer = tf.nn.softmax(tf.matmul(tmp, weights[layer_num-1]) + biases[layer_num-1])
 
     cross_entropy = tf.reduce_mean(
         tf.nn.softmax_cross_entropy_with_logits(
@@ -141,4 +139,4 @@ with tf.Session() as sess:
         test_accuracy = sess.run(accuracy, feed_dict={X: mnist.test.images, Y: mnist.test.labels, keep_prob: 1.0})
         print("Accuracy on test set:", test_accuracy)
 
-    save_c_weights()
+    save_parameters_binary()
