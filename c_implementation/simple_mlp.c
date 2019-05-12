@@ -1,15 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "weights/network3/w1.h"
-#include "weights/network3/w2.h"
-#include "weights/network3/w3.h"
-#include "weights/network3/wout.h"
-#include "weights/network3/b1.h"
-#include "weights/network3/b2.h"
-#include "weights/network3/b3.h"
-#include "weights/network3/bout.h"
-#include "weights/slike.h"
-
+#include "load_parameters.h"
 #include <math.h>
 #include <assert.h>
 #include <sys/time.h>
@@ -121,22 +112,26 @@ void compare_1d_array(float *x, float *y, int length)
 	printf("Max error = %f on index %d\n", max_error, max_index);
 }
 
-void forward_propagation(){
-    calculate_layer(1, input, (float *)w1, b1, L1, 1);    
-    calculate_layer(2, L1, (float *)w2, b2, L2, 1);
-    calculate_layer(3, L2, (float *)w3, b3, L3, 1);
-    calculate_layer(4, L3, (float *)wout, bout, Loutput, 2);
-}
+// void forward_propagation(){
+//     calculate_layer(1, input, (float *)w1, b1, L1, 1);    
+//     calculate_layer(2, L1, (float *)w2, b2, L2, 1);
+//     calculate_layer(3, L2, (float *)w3, b3, L3, 1);
+//     calculate_layer(4, L3, (float *)wout, bout, Loutput, 2);
+// }
 
-void main()
+void main(int argc, char **argv)
 {
+    char *network_name = argv[1];
+    int *layer_sizes;
+
+    load_parameters(network_name, layer_sizes);
  
-	load_input(dvojka);
+	// load_input();
 
     struct timeval  tv1, tv2;
     gettimeofday(&tv1, NULL);
    
-    forward_propagation();
+    // forward_propagation();
 
     gettimeofday(&tv2, NULL);
 

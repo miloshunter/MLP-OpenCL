@@ -84,17 +84,16 @@ void skip_line(FILE *file){
     while(getc(file) != '\n');
 }
 
-int main(int argc, char **argv)
+int load_parameters(char* network_name, int* layer_sizes, 
+                        float **** w, float *** b)
 {
-    char *network_name = argv[1];
 
     printf("Reading parameters for: %s\n", network_name);
-    int *layer_sizes;
     int layer_num;
 
     read_config(network_name, &layer_sizes, &layer_num);
 
-    float ***weights;
+    float ***weights = *weights;
     weights = (float***) malloc((layer_num)*sizeof(float**));
     printf("\nAllocated %d ** pointers for Weights\n", layer_num);
     for(int n=0; n<layer_num; n++){
@@ -104,7 +103,7 @@ int main(int argc, char **argv)
             weights[n][i] = (float*) malloc((layer_sizes[n])*sizeof(float));
         }
     }
-    float **biases;
+    float **biases = *b;
     biases = (float**) malloc((layer_num)*sizeof(float*));
     printf("\nAllocated %d * pointers for Biases\n", layer_num);
     for(int n=0; n<layer_num; n++){
@@ -115,10 +114,12 @@ int main(int argc, char **argv)
     read_parameters(network_name, weights, biases, layer_sizes, layer_num);
 
     // Print weights and biases for testing
-    // int n = layer_num-2;
-    // for(int i=0; i<layer_sizes[n+1]; i++){
-    //     printf("\t %f\n", biases[n][i]);
-    // }
+
+
+    int n = layer_num-1;
+    for(int i=0; i<layer_sizes[n+1]; i++){
+        printf("\t %f\n", biases[n][i]);
+    }
 }
 
 

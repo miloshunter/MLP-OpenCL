@@ -7,10 +7,10 @@ LIBS=-lm -fopenmp
 
 
 load_parameters.o: load_parameters.c
-	$(CC) -o $@ $^
+	$(CC) -c $^
 
-simple_mlp.o: simple_mlp.c
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS) weights/network3/*.o  weights/*.o
+simple_mlp.o: simple_mlp.c load_parameters.o
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 run_load: load_parameters.o
 	./load_parameters.o $(CONF)
