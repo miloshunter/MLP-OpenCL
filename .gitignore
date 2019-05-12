@@ -11,6 +11,8 @@ parameters/*
 test_pics/
 *.json
 
+*.conf
+!default.conf
 
 # Prerequisites
 *.d

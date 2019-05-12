@@ -1,4 +1,4 @@
-CONF?=network.conf
+CONF?=default.conf
 EPOCH?=5
 export CONF
 export EPOCH
@@ -15,4 +15,5 @@ run_openmp:
 clean:
 	@echo "Cleaning up..."
 	@rm -f parameters/*.bin
+	@find ./ -name "*.conf" -not -name "default.conf" -exec rm {} \;
 	@cd c_implementation && make clean
