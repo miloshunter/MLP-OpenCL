@@ -95,7 +95,7 @@ void prepare_and_run_kernel(char* kernel_name, size_t args_num,
         exit(0);
     }
     
-    printf("Global work size: %d + %d\n", global_work_size[0], global_work_size[1]);
+    printf("Global work size: %d + %d\n", (int)global_work_size[0], (int)global_work_size[1]);
     ret = clEnqueueNDRangeKernel(command_queue, kernel, args_num-1, NULL, 
             global_work_size, NULL, 0, NULL, NULL);
     if (ret != CL_SUCCESS) {

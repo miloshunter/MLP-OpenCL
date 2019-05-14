@@ -14,7 +14,7 @@ void read_config(char* filepath, int **array_sizes, int *layer_number)
     FILE *fp;
     int c;
     char tmp[50];
-    sprintf(tmp, filepath);
+    strcpy(tmp, filepath);
 
     fp = fopen(tmp, "r");
     if (fp == 0){
@@ -51,7 +51,7 @@ void read_parameters(char* filename, float ***weights,
     FILE *fp;
     char tmp[50];
     char fname[50];
-    sprintf(fname, filename);
+    strcpy(fname, filename);
     sprintf(tmp, "parameters/%s_weights.bin", 
                 strsep(&filename, "."));
 

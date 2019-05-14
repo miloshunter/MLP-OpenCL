@@ -184,7 +184,7 @@ int main(int argc, char **argv) {
 
     float *flatten_image;
     char tmp[50];
-    sprintf(tmp, argv[2]);
+    strcpy(tmp, argv[2]);
     read_png_file(tmp, &flatten_image);
 
     init_opencl();

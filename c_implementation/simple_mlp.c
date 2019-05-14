@@ -3,7 +3,7 @@
 #include <math.h>
 #include <assert.h>
 #include <sys/time.h>
-// #include <gperftools/profiler.h>
+#include <string.h>
 #include "load_parameters.h"
 #include "read_image.h"
 
@@ -89,7 +89,7 @@ void main(int argc, char **argv)
 
     float *flatten_image;
     char tmp[50];
-    sprintf(tmp, argv[2]);
+    strcpy(tmp, argv[2]);
     read_png_file(tmp, &flatten_image);
 
     struct timeval  tv1, tv2;
@@ -104,12 +104,12 @@ void main(int argc, char **argv)
          (float) (tv2.tv_usec - tv1.tv_usec) +
          (float) 1000000*(tv2.tv_sec - tv1.tv_sec));
 
-    for(size_t i = 0; i < layer_sizes[layer_num]; i++)
+    for(int i = 0; i < layer_sizes[layer_num]; i++)
     {
         printf("  %d\t", i);
     }
     printf("\n");
-    for(size_t i = 0; i < layer_sizes[layer_num]; i++)
+    for(int i = 0; i < layer_sizes[layer_num]; i++)
     {
         printf("%.2f\t", output[i]);
     }
