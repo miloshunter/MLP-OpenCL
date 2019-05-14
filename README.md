@@ -84,6 +84,10 @@ To choose on which **image** (28x28 .png) network will be used, one can set vari
 For example to use network default.conf on image ~/images/example.png using single core and multicore (6 threads OpenMP):
 
 ```C make run_single_core run_openmp CONF=default.conf IMG=~/images/example.png N_THR=6```
+### Cleaning up
+To clean compiled files run **make clean** command.
+
+To clean everything except original source files run **make clean_all** command. This will wipe out all parameters, test files, downloaded MNIST dataset etc.
 
 ## File tree
 ```C
