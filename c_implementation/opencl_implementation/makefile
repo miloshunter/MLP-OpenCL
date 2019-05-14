@@ -16,10 +16,10 @@ all: opencl_utils.o opencl_mlp
 $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-opencl_mlp: $(OBJ) ../load_parameters.o ../read_image.o
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS) opencl_utils.c
+opencl_mlp: $(OBJ) ../load_parameters.o ../read_image.o opencl_utils.o
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
-opencl_utils.o:
+opencl_utils.o: opencl_utils.c opencl_utils.h
 	gcc -c opencl_utils.c
 
 .PHONY: clean

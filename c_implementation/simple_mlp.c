@@ -100,7 +100,7 @@ void main(int argc, char **argv)
 
     gettimeofday(&tv2, NULL);
 
-    printf ("Total time = %f microseconds \n",
+    printf ("\n\t\t*\tTotal time   CPU = %f microseconds \n",
          (float) (tv2.tv_usec - tv1.tv_usec) +
          (float) 1000000*(tv2.tv_sec - tv1.tv_sec));
 

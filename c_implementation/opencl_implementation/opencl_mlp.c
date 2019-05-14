@@ -45,8 +45,9 @@ static void relu(float *input, int input_len){
 }
 
 //  Activation function: 1 - Relu; 2 - softmax
-void calculate_layer(int layer_num, int*layer_size, float* input_matrix, float **weights,
-                        float* biases, float* out_matrix, int activation_function)
+void calculate_layer(
+        int layer_num, int*layer_size, float* input_matrix,
+        float* biases, float* out_matrix, int activation_function)
 {
     gettimeofday(&tvlaystart, NULL);
     int i, j;
@@ -172,6 +173,7 @@ void calculate_layer(int layer_num, int*layer_size, float* input_matrix, float *
 
 
 int main(int argc, char **argv) {
+    struct timeval  tv1, tv2;
     char *network_name = argv[1];
     int *layer_sizes;
     float ***weights;
@@ -189,9 +191,9 @@ int main(int argc, char **argv) {
     read_and_build_kernel_program(
         "c_implementation/opencl_implementation/kernels.cl"
     );
-
-    struct timeval  tv1, tv2;
-
+    //Prepare pointers
+    w_mem_obj_array = (cl_mem*) malloc(layer_num*sizeof(cl_mem));
+    
     // Convert to 1D weights for OpenCL
     float ** tmp_weights = (float **) malloc(layer_num*sizeof(float*));
     for (int n = 0; n < layer_num; n++)
@@ -208,9 +210,8 @@ int main(int argc, char **argv) {
         }
     }
     
-
-    copy_weights_and_biases(layer_sizes, (float *)tmp_weights[0], 
-        (float *)tmp_weights[1], (float*)tmp_weights[2], (float *)tmp_weights[3]);
+    copy_weights_to_device(layer_num, layer_sizes, 
+        tmp_weights);
 
     gettimeofday(&tv1, NULL);
 
@@ -221,28 +222,27 @@ int main(int argc, char **argv) {
         // printf("Allocating %d floats for layer %d\n", layer_size[i+1], i);
     }
     
-    calculate_layer(1, layer_sizes, flatten_image, weights[0], biases[0], L[0], 1); 
+    calculate_layer(1, layer_sizes, flatten_image, biases[0], L[0], 1); 
     for (size_t i = 1; i < layer_num; i++)
     {
         int act_fn = 1;
         if(i==layer_num-1) act_fn = 2;
         calculate_layer(i+1, layer_sizes, L[i-1], 
-                        weights[i], biases[i], L[i], act_fn);
+                        biases[i], L[i], act_fn);
     }
 
     gettimeofday(&tv2, NULL);
-    printf ("\nTotal time = %f microseconds\n",
+    printf ("\n\t\t*\tTotal time OpenCL = %f microseconds\n",
          (float) (tv2.tv_usec - tv1.tv_usec) +
          (float) 1000000*(tv2.tv_sec - tv1.tv_sec));
 
 
     // Display the result to the screen
-    for(int i = 0; i < layer_sizes[4]; i++){
+    for(int i = 0; i < layer_sizes[layer_num]; i++){
         printf("  %d\t", i);
     }
     printf("\n");
-
-    for(int i = 0; i < layer_sizes[4]; i++){
+    for(int i = 0; i < layer_sizes[layer_num]; i++){
         printf("%.2f\t", L[layer_num-1][i]);
     }
     printf("\n");

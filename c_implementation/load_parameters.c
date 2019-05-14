@@ -50,13 +50,17 @@ void read_parameters(char* filename, float ***weights,
 {
     FILE *fp;
     char tmp[50];
+    char fname[50];
+    sprintf(fname, filename);
     sprintf(tmp, "parameters/%s_weights.bin", 
                 strsep(&filename, "."));
 
-    printf("Reading weights from %s\n", tmp);
+    // printf("Reading weights from %s\n", tmp);
     fp = fopen(tmp, "rb");
     if (fp == 0){
         printf("Cannot open file: %s\n", tmp);
+        printf("\n\tPlease check if the network is trained?\n");
+        printf("\tIn order to train network use: make train CONF=%s\n\n", fname);
         exit(-1);
     }
 #ifdef DEBUG

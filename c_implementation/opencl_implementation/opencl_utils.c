@@ -105,36 +105,24 @@ void prepare_and_run_kernel(char* kernel_name, size_t args_num,
 
 }
 
-void copy_weights_and_biases(const int *LAYER_SIZE, float *w1, float *w2, float *w3, float *wout)
+void copy_weights_to_device(int layer_num, 
+        const int *layer_sizes, float** weights)
 {
-    int layer_num = 1;
-    w1_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 
-            (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), NULL, &ret);
+    for (int n = 1; n < layer_num+1; n++)
+    {
+        
+        w_mem_obj_array[n-1] = clCreateBuffer(
+            context, CL_MEM_READ_ONLY, 
+            (layer_sizes[n-1]*layer_sizes[n]) * sizeof(float),
+            NULL, &ret
+        );
 
-    ret = clEnqueueWriteBuffer(command_queue, w1_mem_obj, CL_TRUE, 0,
-                                (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), w1, 0, NULL, NULL);
-    layer_num++;
-
-    w2_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 
-            (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), NULL, &ret);
-    ret = clEnqueueWriteBuffer(command_queue, w2_mem_obj, CL_TRUE, 0,
-                                (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), w2, 0, NULL, NULL);
-    layer_num++;
-    w3_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 
-            (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), NULL, &ret);
-    ret = clEnqueueWriteBuffer(command_queue, w3_mem_obj, CL_TRUE, 0,
-                                (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), w3, 0, NULL, NULL);
-    layer_num++;
-    wout_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 
-            (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), NULL, &ret);
-    ret = clEnqueueWriteBuffer(command_queue, wout_mem_obj, CL_TRUE, 0,
-                                (LAYER_SIZE[layer_num-1]*LAYER_SIZE[layer_num]) * sizeof(float), wout, 0, NULL, NULL);                                                                                            
-
-    w_mem_obj_array[0] = w1_mem_obj;
-    w_mem_obj_array[1] = w2_mem_obj;
-    w_mem_obj_array[2] = w3_mem_obj;
-    w_mem_obj_array[3] = wout_mem_obj;
-
-
+        ret = clEnqueueWriteBuffer(
+                command_queue, w_mem_obj_array[n-1], CL_TRUE, 0,
+                (layer_sizes[n-1]*layer_sizes[n]) * sizeof(float), 
+                weights[n-1], 0, NULL, NULL
+        );
+    }
+    
 }
 

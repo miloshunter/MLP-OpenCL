@@ -7,12 +7,13 @@ export EPOCH
 
 all:
 	cd c_implementation && $(MAKE)
+	cd c_implementation/opencl_implementation && $(MAKE)
 
 train:
-	mkdir -p parameters
-	cd python_training && $(MAKE)
+	@mkdir -p parameters
+	@cd python_training && $(MAKE)
 
-run_test: test_pics/4.png run_single_core run_openmp
+run_test: test_pics/4.png run_single_core run_openmp run_opencl
 
 test_pics/4.png:
 	mkdir -p test_pics
@@ -32,7 +33,7 @@ c_implementation/simple_mlp.o:
 	cd c_implementation && $(MAKE)
 
 c_implementation/opencl_implementation/opencl_mlp:
-	cd c_implementation && $(MAKE)
+	cd c_implementation/opencl_implementation && $(MAKE)
 
 
 

@@ -58,13 +58,13 @@ def save_1d_array(w_array, name, w_type="ab"):
 
 
 def save_parameters_binary():
-    print("\nSaved weights and biases to: parameters/"+
-            NETWORK_NAME[0:-5] +"_weights.bin\n")
     save_2d_array(weights[0].eval(), "w", w_type="wb")
     for i in range(1, layer_num):
         save_2d_array(weights[i].eval(), "w2")
     for i in range(0, layer_num):
         save_1d_array(biases[i].eval(), "b1")
+    print("\nSaved weights and biases to: parameters/"+
+            NETWORK_NAME[0:-5] +"_weights.bin\n")
 
 
 
