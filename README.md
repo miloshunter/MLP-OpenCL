@@ -23,7 +23,7 @@ Only forward propagation is implemented for now.
 
  * OpenMP and OpenCL should be installed on system
  
- To check if OpenCL device exists, one can use: **clinfo** package
+ To check if OpenCL drivers and devices exist, one can use: **clinfo** package
 
 ## Training, compiling and execution
 To test everything with default setup just run command:
