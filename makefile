@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 CONF?=default.conf
 EPOCH?=2
 IMG?=test_pics/4.png
