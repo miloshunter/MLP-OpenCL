@@ -25,25 +25,67 @@ Only forward propagation is implemented for now.
  
  To check if OpenCL device exists, one can use: **clinfo** package
 
+## Training, compiling and execution
+To test everything with default setup just run command:
 
-## Expectations
-Hypothesis 1: MLP on CPU programmed with OpenMP will run faster than MLP programmed in bare C
+```C
+make train test_run
+```
 
-Hypothesis 2: Every implementation on GPU will run faster than any implementation on CPU
+This command will train default network, compile code, download test image and run Single Core test, MultiCore OpenMP test and OpenCL test, if all dependencies are satisfied.
 
-Hypothesis 3: Size of a network (ie. number of layers and operations that are needed to be calculated) greatly impacts the speedup of GPU implementation. Larger networks should get more speedup than smaller when network is beeing run on GPU.
+If not using OpenCL, just testing single core vs multi core CPU performance run following command:
 
-Hypothesis 4: Implementations in OpenCL and Tensorflow should be comparable. Tensorflow will be probably a bit faster, since this project is not about trying to optimize as much as possible.
+```C
+make train 
+make run_single_core         #  For single thread
+make run_openmp N_THR=4      # For 4 thread test
+```
 
-## Methodology
-1) The network is trained in Tensorflow.
-2) The MLP algorithm is written in bare C, for CPU, without any parallelization.
-3) OpenMP is used for accelerating the C implementation, ran on CPU.
-4) OpenCL implementation, but ran on GPU.
-5) Comparison of results
-6) Conclusion
+Checkout file tree structure below. Everything is done by using **make** commands.
 
-## File tree at the end of the project
+Configuration of a network is done by using **\<network-name\>.conf** file (template default.conf is provided). One should not change the form of a file, just add/remove layers.
+
+When particular network is used, please provide every **make** command with **CONF=\<network-name\>.conf** variable.
+
+```C
+4       -   number of layers
+Size    | Type
+784     - input
+256      - fully connected
+128      - fully connected
+64      - fully connected
+10     - output (softmax)
+```
+### Train network
+Network is trained on MNIST dataset, which is automatically downloaded when needed.
+
+In order to train network use **make train** command. For example to train network for *5* epochs and if network is defined in mlp.conf file, one should use:
+
+```make train CONF=mlp.conf EPOCH=5```
+
+If no CONF is provided, default.conf is used and trained for 2 epochs.
+
+### Build code
+To build C code, just run **make** in root directory.
+
+### Run programs
+Before running program, please make sure that the network is trained (by checking **parameters/** dir for **\<network-name\>_weights.bin** file.
+
+There are few options on what to run:
+```C
+make run_single_core 
+make run_openmp
+make run_opencl
+```
+
+To choose on which **image** (28x28 .png) network will be used, one can set variable IMG=<path_to_image>/image.png.
+
+For example to use network default.conf on image ~/images/example.png using single core and multicore (6 threads OpenMP):
+
+```C make run_single_core run_openmp CONF=default.conf IMG=~/images/example.png N_THR=6```
+
+## File tree
 ```C
 |-- c_implementation
 |   |-- load_parameters.c
@@ -67,6 +109,26 @@ Hypothesis 4: Implementations in OpenCL and Tensorflow should be comparable. Ten
 |   `-- requirements.txt
 `-- README.md
 ```
+
+
+
+## Expectations
+Hypothesis 1: MLP on CPU programmed with OpenMP will run faster than MLP programmed in bare C
+
+Hypothesis 2: Every implementation on GPU will run faster than any implementation on CPU
+
+Hypothesis 3: Size of a network (ie. number of layers and operations that are needed to be calculated) greatly impacts the speedup of GPU implementation. Larger networks should get more speedup than smaller when network is beeing run on GPU.
+
+Hypothesis 4: Implementations in OpenCL and Tensorflow should be comparable. Tensorflow will be probably a bit faster, since this project is not about trying to optimize as much as possible.
+
+## Methodology
+1) The network is trained in Tensorflow.
+2) The MLP algorithm is written in bare C, for CPU, without any parallelization.
+3) OpenMP is used for accelerating the C implementation, ran on CPU.
+4) OpenCL implementation, but ran on GPU.
+5) Comparison of results
+6) Conclusion
+
 ## Results
 ### Hypothesis 1:
 _MLP on CPU programmed with OpenMP will run faster than MLP programmed in bare C_
