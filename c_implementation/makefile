@@ -9,7 +9,7 @@ LIBS=-lm -fopenmp -lpng
 all: simple_mlp.o
 	cd opencl_implementation && $(MAKE)
 
-load_parameters.o: load_parameters.c load_parameters.h
+load_parameters.o: load_parameters.c
 	$(CC) -c $^
 
 simple_mlp.o: simple_mlp.c load_parameters.o read_image.o
