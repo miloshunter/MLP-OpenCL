@@ -1,4 +1,2 @@
-tensorflow-gpu
-pillow
-scikit-image
-scipy
+tensorflow
+numpy

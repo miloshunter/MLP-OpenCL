@@ -20,10 +20,10 @@ test_pics/4.png:
 	wget https://www.dropbox.com/s/enrn8w7zlkmc6c4/4.png
 	mv 4.png test_pics/
 
-run_openmp: c_implementation/simple_mlp.o
+run_openmp: test_pics/4.png c_implementation/simple_mlp.o
 	export OMP_NUM_THREADS=$(N_THR) && ./c_implementation/simple_mlp.o $(CONF) $(IMG)
 
-run_opencl: c_implementation/opencl_implementation/opencl_mlp
+run_opencl: test_pics/4.png c_implementation/opencl_implementation/opencl_mlp
 	./c_implementation/opencl_implementation/opencl_mlp $(CONF) $(IMG)
 
 run_single_core: c_implementation/simple_mlp.o

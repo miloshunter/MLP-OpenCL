@@ -8,6 +8,22 @@ Only forward propagation is implemented for now.
 
 [***Wiki***](https://github.com/miloshunter/MLP-OpenCL/wiki) will contain theoretical knowledge and methodology, so feel free to check it out.
 
+## Requirements
+ * Python3 depencencies are noted in [python_training/Requirements.txt](https://github.com/miloshunter/MLP-OpenCL/blob/master/python_training/requirements.txt) file
+`
+pip3 install -r python_training/Requirements.txt
+`
+
+ * Requires [libpng](http://www.libpng.org/pub/png/) to be installed 
+ `
+ Ubuntu: apt install libpng-dev
+`
+
+ * OpenMP and OpenCL should be installed on system
+ 
+ To check if OpenCL device exists, one can use: **clinfo** package
+
+
 ## Expectations
 Hypothesis 1: MLP on CPU programmed with OpenMP will run faster than MLP programmed in bare C
 
