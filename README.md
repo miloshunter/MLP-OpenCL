@@ -11,15 +11,15 @@ Only forward propagation is implemented for now.
 ## Requirements
  * Python3 depencencies are noted in [python_training/Requirements.txt](https://github.com/miloshunter/MLP-OpenCL/blob/master/python_training/requirements.txt) file
 
-`
-pip3 install -r python_training/Requirements.txt
-
-`
+ `
+ pip3 install -r python_training/Requirements.txt
+ `
 
  * Requires [libpng](http://www.libpng.org/pub/png/) to be installed 
+ 
  `
  Ubuntu: apt install libpng-dev
-`
+ `
 
  * OpenMP and OpenCL should be installed on system
  
