@@ -199,7 +199,7 @@ int main(int argc, char **argv) {
 
     init_opencl();
     read_and_build_kernel_program(
-        "c_implementation/opencl_implementation/new_kernel.cl"
+        "c_implementation/opencl_implementation/kernels.cl"
     );
 
     struct timeval  tv1, tv2;
