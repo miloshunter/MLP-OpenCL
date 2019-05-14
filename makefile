@@ -22,11 +22,18 @@ test_pics/4.png:
 run_openmp: c_implementation/simple_mlp.o
 	export OMP_NUM_THREADS=$(N_THR) && ./c_implementation/simple_mlp.o $(CONF) $(IMG)
 
+run_opencl: c_implementation/opencl_implementation/opencl_mlp
+	./c_implementation/opencl_implementation/opencl_mlp $(CONF) $(IMG)
+
 run_single_core: c_implementation/simple_mlp.o
 	export OMP_NUM_THREADS=1 && ./c_implementation/simple_mlp.o $(CONF) $(IMG)
 
 c_implementation/simple_mlp.o:
 	cd c_implementation && $(MAKE)
+
+c_implementation/opencl_implementation/opencl_mlp:
+	cd c_implementation && $(MAKE)
+
 
 
 clean_all:
