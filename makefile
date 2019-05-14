@@ -31,7 +31,7 @@ run_openmp: test_pics/4.png c_implementation/simple_mlp.o
 run_opencl: test_pics/4.png c_implementation/opencl_implementation/opencl_mlp
 	./c_implementation/opencl_implementation/opencl_mlp $(CONF) $(IMG)
 
-run_single_core: c_implementation/simple_mlp.o
+run_single_core: test_pics/4.png c_implementation/simple_mlp.o
 	export OMP_NUM_THREADS=1 && ./c_implementation/simple_mlp.o $(CONF) $(IMG)
 
 c_implementation/simple_mlp.o:
