@@ -23,8 +23,8 @@ test_pics/4.png:
 
 download_test_pics:
 	mkdir -p test_pics
-	wget https://www.dropbox.com/s/enrn8w7zlkmc6c4/{0..9}.png
-	mv {0..9}.png test_pics/
+	wget https://www.dropbox.com/s/hj2jiwjz4lsqjmf/test_pics.tar
+	tar -xvf test_pics.tar --directory test_pics/
 
 run_openmp: test_pics/4.png c_implementation/simple_mlp.o
 	export OMP_NUM_THREADS=$(N_THR) && ./c_implementation/simple_mlp.o $(CONF) $(IMG)
