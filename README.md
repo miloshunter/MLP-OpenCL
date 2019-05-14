@@ -29,7 +29,7 @@ Only forward propagation is implemented for now.
 To test everything with default setup just run command:
 
 ```C
-make train test_run
+make train default_test
 ```
 
 This command will train default network, compile code, download test image and run Single Core test, MultiCore OpenMP test and OpenCL test, if all dependencies are satisfied.
