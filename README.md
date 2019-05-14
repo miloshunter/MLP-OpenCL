@@ -27,34 +27,27 @@ Hypothesis 4: Implementations in OpenCL and Tensorflow should be comparable. Ten
 
 ## File tree at the end of the project
 ```C
-├── c_implementation
-│   ├── load_parameters.c
-│   ├── load_parameters.h
-│   ├── makefile
-│   ├── opencl_implementation
-│   │   ├── makefile
-│   │   ├── new_kernel.cl
-│   │   ├── opencl_mlp.c
-│   │   ├── opencl_utils.c
-│   │   ├── opencl_utils.h
-│   │   └── test_kernel.c
-│   ├── read_image.c
-│   ├── read_image.h
-│   └── simple_mlp.c
-├── default.conf
-├── LICENSE
-├── makefile
-├── parameters
-├── python_training
-│   ├── makefile
-│   ├── MNIST_data
-│   │   ├── t10k-images-idx3-ubyte.gz
-│   │   ├── t10k-labels-idx1-ubyte.gz
-│   │   ├── train-images-idx3-ubyte.gz
-│   │   └── train-labels-idx1-ubyte.gz
-│   ├── mnist_train.py
-│   └── requirements.txt
-├── README.md
+|-- c_implementation
+|   |-- load_parameters.c
+|   |-- load_parameters.h
+|   |-- makefile
+|   |-- opencl_implementation
+|   |   |-- makefile
+|   |   |-- new_kernel.cl
+|   |   |-- opencl_mlp.c
+|   |   |-- opencl_utils.c
+|   |   |-- opencl_utils.h
+|   |-- read_image.c
+|   |-- read_image.h
+|   `-- simple_mlp.c
+|-- default.conf
+|-- LICENSE
+|-- makefile
+|-- python_training
+|   |-- makefile
+|   |-- mnist_train.py
+|   `-- requirements.txt
+`-- README.md
 ```
 ## Results
 ### Hypothesis 1:
