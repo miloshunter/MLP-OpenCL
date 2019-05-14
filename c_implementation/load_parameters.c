@@ -9,16 +9,16 @@
 // #define DEBUG
 
 
-void read_config(char* filename, int **array_sizes, int *layer_number)
+void read_config(char* filepath, int **array_sizes, int *layer_number)
 {
     FILE *fp;
     int c;
     char tmp[50];
-    sprintf(tmp, "../%s", filename);
+    sprintf(tmp, filepath);
 
     fp = fopen(tmp, "r");
     if (fp == 0){
-        printf("Cannot open file: %s\n", tmp);
+        printf("Cannot open file: %s\n", filepath);
         exit(-1);
     }
     char * line = NULL;
@@ -38,13 +38,11 @@ void read_config(char* filename, int **array_sizes, int *layer_number)
 
 void print_network_config(int layer_num, int *layer_sizes)
 {
-    printf("\nNumber of layers is: %d\n", layer_num);
-    printf("Layer sizes are: \n");
-    printf("\tInput %d: %d\n", 0, layer_sizes[0]);
-    for(int i=1; i<layer_num+1; i++){
-        printf("\tLayer %d: %d\n", i, layer_sizes[i]);
+    printf("****Number of layers is: %d\t[  ", layer_num);
+    for(int i=0; i<layer_num+1; i++){
+        printf("%d:%d\t", i, layer_sizes[i]);
     }
-    printf("\n");
+    printf("]\n");
 }
 
 void read_parameters(char* filename, float ***weights,
@@ -52,7 +50,7 @@ void read_parameters(char* filename, float ***weights,
 {
     FILE *fp;
     char tmp[50];
-    sprintf(tmp, "../parameters/%s_weights.bin", 
+    sprintf(tmp, "parameters/%s_weights.bin", 
                 strsep(&filename, "."));
 
     printf("Reading weights from %s\n", tmp);

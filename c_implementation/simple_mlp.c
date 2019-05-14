@@ -89,7 +89,7 @@ void main(int argc, char **argv)
 
     float *flatten_image;
     char tmp[50];
-    sprintf(tmp, "../test_pics/%s", argv[2]);
+    sprintf(tmp, argv[2]);
     read_png_file(tmp, &flatten_image);
 
     struct timeval  tv1, tv2;
@@ -100,11 +100,10 @@ void main(int argc, char **argv)
 
     gettimeofday(&tv2, NULL);
 
-    printf ("Total time using OpenMP = %f microseconds \n",
+    printf ("Total time = %f microseconds \n",
          (float) (tv2.tv_usec - tv1.tv_usec) +
          (float) 1000000*(tv2.tv_sec - tv1.tv_sec));
 
-    printf("Izracunat izlaz: \n");
     for(size_t i = 0; i < layer_sizes[layer_num]; i++)
     {
         printf("  %d\t", i);

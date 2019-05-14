@@ -1,23 +1,23 @@
-IDIR =~/NVIDIA\ GPU\ Computing\ SDK/OpenCL/common/inc/
 CC=gcc
 CFLAGS=-I$(IDIR) -g -O0
 
 ODIR=obj
-LDIR =../lib
+LDIR =../
 
-LIBS=-lm -lOpenCL
+LIBS=-lm -lOpenCL -lpng
 
 _DEPS = opencl_mlp.o
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
 OBJ = opencl_mlp.o
 
+all: opencl_utils.o opencl_mlp
 
 $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-opencl_mlp: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS) ../weights/network3/*.o opencl_utils.c ../weights/slike.o
+opencl_mlp: $(OBJ) ../load_parameters.o ../read_image.o
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS) opencl_utils.c
 
 opencl_utils.o:
 	gcc -c opencl_utils.c

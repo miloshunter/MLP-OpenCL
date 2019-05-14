@@ -1,22 +1,31 @@
 CONF?=default.conf
 EPOCH?=2
+IMG?=test_pics/4.png
+N_THR?=4
 export CONF
 export EPOCH
 
-all: train run_test
+all:
+	cd c_implementation && $(MAKE)
 
 train:
 	mkdir -p parameters
 	cd python_training && $(MAKE)
 
-run_test: get_test_image run_openmp
+run_test: test_pics/4.png run_single_core run_openmp
 
-get_test_image:
+test_pics/4.png:
 	mkdir -p test_pics
 	wget https://www.dropbox.com/s/enrn8w7zlkmc6c4/4.png
 	mv 4.png test_pics/
 
-run_openmp:
+run_openmp: c_implementation/simple_mlp.o
+	export OMP_NUM_THREADS=$(N_THR) && ./c_implementation/simple_mlp.o $(CONF) $(IMG)
+
+run_single_core: c_implementation/simple_mlp.o
+	export OMP_NUM_THREADS=1 && ./c_implementation/simple_mlp.o $(CONF) $(IMG)
+
+c_implementation/simple_mlp.o:
 	cd c_implementation && $(MAKE)
 
 
@@ -26,6 +35,7 @@ clean_all:
 	@rm -rf test_pics
 	@find ./ -name "*.conf" -not -name "default.conf" -exec rm {} \;
 	@cd c_implementation && make clean
+	@cd python_training && make clean
 
 clean:
 	@cd c_implementation && make clean

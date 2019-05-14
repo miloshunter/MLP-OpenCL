@@ -4,15 +4,8 @@
 #include <math.h>
 #include <sys/time.h>
 #include "opencl_utils.h"
-#include "../weights/network3/w1.h"
-#include "../weights/network3/b1.h"
-#include "../weights/network3/w2.h"
-#include "../weights/network3/b2.h"
-#include "../weights/network3/w3.h"
-#include "../weights/network3/b3.h"
-#include "../weights/network3/wout.h"
-#include "../weights/network3/bout.h"
-#include "../weights/slike.h"
+#include "../read_image.h"
+#include "../load_parameters.h"
 
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
@@ -22,36 +15,8 @@
 
 #define MAX_SOURCE_SIZE (0x100000)
 
-#define PIC_SIZE 28
-#define INPUT_SIZE 28*28
-#define CLASS_NUM 10
-
 struct timeval  tv1, tv2, tv3, tv4;
 struct timeval  tvlaystart, tvlayend;
-
-
-#define n_input  784
-#define n_layer1  4096
-#define n_layer2  2048 
-#define n_layer3  2048
-#define n_output  10
-const int LAYER_SIZE[5] = {n_input, n_layer1, n_layer2, n_layer3, n_output};
-
-
-//  Placeholders for calculations
-float input[INPUT_SIZE];
-float L1[n_layer1];
-float L2[n_layer2];
-float L3[n_layer3];
-float Loutput[n_output];
-
-void load_input(float* image)
-{
-	for (int i = 0; i < n_input; i++)
-	{
-		input[i] = image[i];
-	}
-}
 
 static void softmax(float *input, size_t input_len) {
     float * Z = input;
@@ -77,36 +42,17 @@ static void relu(float *input, int input_len){
     }
 }
 
-void compare_1d_array(float *x, float *y, int length)
-{
-	float max_error = 0;
-    int max_index = -1;
-	for (int i = 0; i < length; i++){
-		if (fabs((x[i]-y[i])) > max_error)
-		{
-			max_error = fabs((x[i] - y[i]));
-            max_index = i;
-		}
-        if (1){
-            printf("%d : \t%f\t%f razlika = %f\n",
-                      i,  x[i], y[i], fabs((x[i] - y[i])));
-        }
-	}
-	printf("Max error = %f on index %d \n", max_error, max_index);
-}
-
-
 //  Activation function: 1 - Relu; 2 - softmax
-void calculate_layer(int layer_number, float* input_matrix, float *weights,
+void calculate_layer(int layer_num, int*layer_size, float* input_matrix, float **weights,
                         float* biases, float* out_matrix, int activation_function)
 {
     gettimeofday(&tvlaystart, NULL);
     int i, j;
-    printf("Calculating layer: %d\n", layer_number);
+    printf("Calculating layer: %d\n", layer_num);
     
     gettimeofday(&tv1, NULL);
-    int N_IN = LAYER_SIZE[layer_number-1];
-    int N_OUT = LAYER_SIZE[layer_number];
+    int N_IN = layer_size[layer_num-1];
+    int N_OUT = layer_size[layer_num];
 
     gettimeofday(&tv3, NULL);
     cl_mem in_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY,
@@ -138,7 +84,7 @@ void calculate_layer(int layer_number, float* input_matrix, float *weights,
 
     gettimeofday(&tv3, NULL);
     ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&in_mem_obj);
-    ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&w_mem_obj_array[layer_number-1]);
+    ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&w_mem_obj_array[layer_num-1]);
     ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&calc_mem_obj);
     clFinish(command_queue);
     gettimeofday(&tv4, NULL);
@@ -203,7 +149,7 @@ void calculate_layer(int layer_number, float* input_matrix, float *weights,
          (float) 1000000*(tv2.tv_sec - tv1.tv_sec));
    
     gettimeofday(&tv1, NULL);    
-    for(size_t i = 0; i < LAYER_SIZE[layer_number]; i++)
+    for(size_t i = 0; i < layer_size[layer_num]; i++)
     {
         out_matrix[i] += biases[i];
     }
@@ -224,8 +170,8 @@ void calculate_layer(int layer_number, float* input_matrix, float *weights,
          (float) (tv2.tv_usec - tv1.tv_usec) +
          (float) 1000000*(tv2.tv_sec - tv1.tv_sec));
 
-    if(layer_number > 0){
-        clRetainMemObject(w_mem_obj_array[layer_number-1]);
+    if(layer_num > 0){
+        clRetainMemObject(w_mem_obj_array[layer_num-1]);
     }
     clFinish(command_queue);
     gettimeofday(&tvlayend, NULL);
@@ -237,24 +183,48 @@ void calculate_layer(int layer_number, float* input_matrix, float *weights,
 }
 
 
-int main(void) {
-    load_input(dvojka);
+int main(int argc, char **argv) {
+    char *network_name = argv[1];
+    int *layer_sizes;
+    float ***weights;
+    float **biases;
+
+    int layer_num = load_parameters(network_name, &layer_sizes, 
+                            &weights, &biases);
+
+    float *flatten_image;
+    char tmp[50];
+    sprintf(tmp, "test_pics/%s", argv[2]);
+    read_png_file(tmp, &flatten_image);
 
     init_opencl();
-    read_and_build_kernel_program("new_kernel.cl");
+    read_and_build_kernel_program(
+        "c_implementation/opencl_implementation/new_kernel.cl"
+    );
 
     struct timeval  tv1, tv2;
 
-    copy_weights_and_biases(LAYER_SIZE, (float *)w1, (float *)w2, 
-                                (float *)w3, (float *)wout);
+    copy_weights_and_biases(layer_sizes, (float *)weights[0], (float *)weights[1], 
+                                (float *)weights[2], (float *)weights[3]);
 
     gettimeofday(&tv1, NULL);
 
-    calculate_layer(1, input, (float *)w1, b1, L1, 1);
-    calculate_layer(2, L1, (float *)w2, b2, L2, 1);
-    calculate_layer(3, L2, (float *)w3, b3, L3, 1);
-    calculate_layer(4, L3, (float *)wout, bout, Loutput, 2);
-  
+    float **L = (float**) malloc(layer_num*sizeof(float*));
+    for (size_t i = 0; i < layer_num; i++)
+    {
+        L[i] = (float*) calloc(layer_sizes[i+1], sizeof(float));
+        // printf("Allocating %d floats for layer %d\n", layer_size[i+1], i);
+    }
+    
+    calculate_layer(1, layer_sizes, flatten_image, weights[0], biases[0], L[0], 1); 
+    for (size_t i = 1; i < layer_num; i++)
+    {
+        int act_fn = 1;
+        if(i==layer_num-1) act_fn = 2;
+        calculate_layer(i+1, layer_sizes, L[i-1], 
+                        weights[i], biases[i], L[i], act_fn);
+    }
+
     gettimeofday(&tv2, NULL);
     printf ("\nTotal time = %f microseconds\n",
          (float) (tv2.tv_usec - tv1.tv_usec) +
@@ -263,13 +233,13 @@ int main(void) {
 
     // Display the result to the screen
     printf("Rezultat: \n");
-    for(int i = 0; i < LAYER_SIZE[4]; i++){
+    for(int i = 0; i < layer_sizes[4]; i++){
         printf("  %d\t", i);
     }
     printf("\n");
 
-    for(int i = 0; i < LAYER_SIZE[4]; i++){
-        printf("%.2f\t", Loutput[i]);
+    for(int i = 0; i < layer_sizes[4]; i++){
+        printf("%.2f\t", L[layer_num-1][i]);
     }
     printf("\n");
 

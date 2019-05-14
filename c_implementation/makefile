@@ -7,7 +7,7 @@ CFLAGS=-I$(IDIR) -g -O0
 LIBS=-lm -fopenmp -lpng
 
 all: simple_mlp.o
-	./simple_mlp.o $(CONF) $(IMG)
+	cd opencl_implementation && $(MAKE)
 
 load_parameters.o: load_parameters.c load_parameters.h
 	$(CC) -c $^
