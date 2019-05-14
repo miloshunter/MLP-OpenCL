@@ -13,7 +13,7 @@ train:
 	@mkdir -p parameters
 	@cd python_training && $(MAKE)
 
-run_test: test_pics/4.png run_single_core run_openmp run_opencl
+default_test: test_pics/4.png run_single_core run_openmp run_opencl
 
 test_pics/4.png:
 	mkdir -p test_pics
