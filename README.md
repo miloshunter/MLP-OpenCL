@@ -85,7 +85,8 @@ To download 10 test images run: ```make download_test_pics```
 
 For example to use network default.conf on image ~/images/example.png using single core and multicore (6 threads OpenMP):
 
-```C make run_single_core run_openmp CONF=default.conf IMG=~/images/example.png N_THR=6```
+```C
+make run_single_core run_openmp CONF=default.conf IMG=~/images/example.png N_THR=6```
 ### Cleaning up
 To clean compiled files run **make clean** command.
 
